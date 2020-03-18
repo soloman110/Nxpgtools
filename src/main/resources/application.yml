@@ -5,10 +5,420 @@ security:
     password: admin
 file:
   upload-dir: ./uploads
-  
 spring:
   http:
     encoding:
       charset: UTF-8
       enabled: true
       force: true
+task:
+  partial:
+    url: http://ncms-api-stg.skb-doj-dev01.mybluemix.net
+    user: user
+    password: user123
+  redis:
+    url: https://xpg-nxpg-stg.skb-doj-dev01.mybluemix.net/task/hget/
+  nxpg:
+    url: https://xpg-nxpg-stg.skb-doj-dev01.mybluemix.net
+user:
+  xpg:
+    IF-NXPG-001:
+      path: /v5/menu/gnb
+      api: INFNXPG001|menus
+      requestparam: stb_id,menu_stb_svc_id
+      processing:
+    IF-NXPG-002:
+      path: /v5/menu/all
+      api: INFNXPG002|menus
+      requestparam: stb_id,menu_stb_svc_id
+      processing:
+    IF-NXPG-003:
+      path: /v5/menu/block
+      api: INFNXPG003|banners,INFNXPG004|blocks
+      requestparam: stb_id,menu_stb_svc_id,menu_id
+      processing:
+  collections:
+    INFNXPG001:
+      name: menu_gnb
+      mqkey: menu_stb_svc_id,version
+      requestparam: menu_stb_svc_id,version
+      referencekey: menu_stb_svc_id
+      path: /xpg/v5/menu/gnb
+      isArray: true
+      itemIsString: false
+      isSingleKey: false
+      baseField: items.item
+      datefilter: dist_fr_dt|dist_to_dt
+      segment:
+    INFNXPG002:
+      name: menu_all
+      mqkey: menu_stb_svc_id,version
+      requestparam: menu_stb_svc_id,version
+      referencekey: menu_stb_svc_id
+      path: /xpg/v5/menu/all
+      isArray: true
+      itemIsString: false
+      isSingleKey: false
+      baseField: items.item
+      datefilter: dist_fr_dt|dist_to_dt
+      segment:
+    INFNXPG003:
+      name: big_banner
+      mqkey: menu_stb_svc_id,menu_id
+      requestparam: menu_stb_svc_id,menu_id,bnr_seg_id
+      referencekey: menu_stb_svc_id,menu_id
+      path: /xpg/v5/block/bigBanner
+      isArray: false
+      itemIsString: true
+      isSingleKey: false
+      baseField: items.item
+      datefilter: dist_fr_dt|dist_to_dt
+      segment: cmpgn_id|bnr_seg_id
+    INFNXPG004:
+      name: block_block
+      mqkey: menu_stb_svc_id,menu_id
+      requestparam: menu_stb_svc_id,menu_id,seg_id
+      referencekey: menu_stb_svc_id,menu_id
+      path: /xpg/v5/block/block
+      isArray: false
+      itemIsString: true
+      isSingleKey: false
+      baseField: items.item
+      datefilter: dist_fr_dt|dist_to_dt
+      segment: cmpgn_id|seg_id
+    INFNXPG005:
+      name: grid_banner
+      mqkey: menu_stb_svc_id,menu_id
+      requestparam: menu_stb_svc_id,menu_id
+      referencekey: menu_stb_svc_id,menu_id
+      path: /xpg/v5/grid/banner
+      isArray: false
+      itemIsString: true
+      isSingleKey: false
+      baseField: items.item
+      deleteField: banners[*]
+      checkField: menu_id,total_count,version,banners,menu_id,menu_nm,call_typ_cd,call_url,menu_exps_prop_cd,scn_mthd_cd,svc_prop_cd,lim_lvl_yn,prd_typ_cd,asis_prd_typ_cd,is_compound_prd,prd_prc_id,prd_prc,prd_prc_vat,sale_prc,sale_prc_vat,img_dist_yn,bnr_det_typ_cd,bnr_exps_mthd_cd,bnr_on_img_path,bnr_off_img_path,bnr_expl,cnts_typ_cd,mmtf_home_exps_yn,shcut_epsd_id,shcut_sris_id,shcut_menu_id,synon_typ_cd,cw_call_id_val,vas_id,vas_svc_id,vas_itm_id,gnb_typ_cd,cmpgn_id,cmpgn_nm,cmpgn_fr_dt,cmpgn_to_dt,cmpgn_apl_fr_dt,cmpgn_apl_to_dt,cmpgn_itlk_typ_cd,dist_fr_dt,dist_to_dt,uguid_typ_cd,uguid_title,uguid_expl,guide_imgs,uguid_epsd_rslu_id
+    INFNXPG006:
+      name: grid_contents
+      mqkey: menu_id
+      requestparam: menu_id
+      referencekey: menu_id
+      path: /xpg/v5/grid/contents
+      isArray: false
+      itemIsString: true
+      isSingleKey: false
+      baseField: items.item
+      deleteField:
+      checkField: menu_id,total_count,contents,sris_id,sort_seq,brcast_tseq_nm,title,epsd_id,synon_typ_cd,wat_lvl_cd,adlt_lvl_cd,badge_typ_nm,bas_badge_img_path,user_badge_img_path,user_badge_wdt_img_path,icon_exps_fr_dt,icon_exps_to_dt,poster_filename_h,poster_filename_v,meta_typ_cd,kids_yn,svc_fr_dt,svc_to_dt,sris_dist_fir_svc_dt,epsd_dist_fir_svc_dt,cacbro_yn,rslu_typ_cd,sale_prc
+    INFNXPG007:
+      name: synopsis_contents
+      mqkey: sris_id
+      requestparam: sris_id
+      referencekey: sris_id
+      path: /xpg/v5/synopsis/common
+      isArray: false
+      itemIsString: false
+      isSingleKey: false
+      baseField: items.item
+      deleteField:
+      checkField: sris_id,bg_img_path,dark_img_yn,poss_bg_img,sris_typ_cd,title_img_path,title,meta_title_colr_val,open_yr,meta_typ_cd,svc_fr_dt,svc_to_dt,sris_poster_filename_h,sris_poster_filename_v,sris_snss_cts,sris_sales_comt_exps_mthd_cd,sris_sales_comt_cts,sris_sales_comt_img_path,sris_sales_comt_call_typ_cd,sris_sales_comt_call_objt_id,sris_sales_vas_svc_id,sris_sales_vas_itm_id,sris_sales_comt_call_url,sris_evt_comt_exps_mthd_cd,sris_evt_comt_cts,sris_evt_comt_img_path,sris_evt_comt_call_typ_cd,sris_evt_comt_call_objt_id,sris_evt_vas_svc_id,sris_evt_vas_itm_id,sris_evt_comt_call_url,aprc_pt_cts,aprc_pt_cts_colr_val,sson_choic_nm,prev_sris_id,prev_epsd_id,next_sris_id,next_epsd_id,kids_yn
+    INFNXPG008:
+      name: synopsis_srisInfo
+      mqkey: sris_id,epsd_id
+      requestparam: sris_id,epsd_id
+      referencekey: epsd_id
+      path: /xpg/v5/synopsis/epsdInfo
+      isArray: false
+      itemIsString: false
+      isSingleKey: false
+      baseField: items.item
+      deleteField:
+      checkField: sris_id,epsd_id,sub_title,brcast_tseq_nm,brcast_dy,wat_lvl_cd,adlt_lvl_cd,meta_typ_cd,rslu_typ_cd,play_tms_val,snd_typ_cd,mtx_capt_yn,nscrn_yn,director,actor,guest,chrtr,tpcc_comt,epsd_snss_cts,epsd_poster_filename_h,epsd_poster_filename_v,epsd_sales_comt_exps_mthd_cd,epsd_sales_comt_cts,epsd_sales_comt_img_path,epsd_sales_comt_call_typ_cd,epsd_sales_comt_call_objt_id,epsd_sales_vas_svc_id,epsd_sales_vas_itm_id,epsd_sales_comt_call_url,epsd_evt_comt_exps_mthd_cd,epsd_evt_comt_cts,epsd_evt_comt_img_path,epsd_evt_comt_call_typ_cd,epsd_evt_comt_call_objt_id,epsd_evt_vas_svc_id,epsd_evt_vas_itm_id,epsd_evt_comt_call_url,cacbro_yn,cacbro_cd,cw_call_id_val,pcim_dimn_cd,svc_fr_dt,svc_to_dt,gstn_yn,epsd_rslu_info,products,relation_contents,ukey_products
+    INFNXPG009:
+      name: synopsis_gateway
+      mqkey: sris_id
+      requestparam: sris_id
+      referencekey: sris_id
+      path: /xpg/v5/synopsis/gateway
+      isArray: false
+      itemIsString: false
+      isSingleKey: false
+      baseField: items.item
+      deleteField:
+      checkField: 
+    INFNXPG010:
+      name: synopsis_commerce
+      mqkey: sris_id
+      requestparam: sris_id
+      referencekey: sris_id
+      path: /xpg/v5/synopsis/commerce
+      isArray: false
+      itemIsString: false
+      isSingleKey: false
+      baseField: items.item
+      deleteField:
+      checkField: sris_id,bg_img_path,prd_prc_id,prd_typ_cd,asis_prd_typ_cd,prd_prc,prd_prc_vat,sale_prc,sale_prc_vat,rltn_prd_nm,rltn_prd_expl,info_id,delivery_info_id,refund_info_id,clause_info_id,meta_typ_cd,svc_fr_dt,svc_to_dt,kids_yn,contents,products
+    INFNXPG011:
+      name: contents_people
+      mqkey: sris_id,epsd_id
+      requestparam: sris_id,epsd_id
+      referencekey: epsd_id
+      path: /xpg/v5/contents/people
+      isArray: false
+      itemIsString: false
+      isSingleKey: false
+      baseField: items.item
+      deleteField:
+      checkField: sris_id,epsd_id,peoples,prs_id,prs_role_cd,prs_role_nm,prs_nm,prs_plrl_nm,img_path,sort_seq
+    INFNXPG012:
+      name: contents_preview
+      mqkey: sris_id
+      requestparam: sris_id
+      referencekey: sris_id
+      path: /xpg/v5/contents/preview
+      isArray: false
+      itemIsString: false
+      isSingleKey: false
+      baseField: items.item
+      deleteField:
+      checkField: sris_id,preview,stillCut,special
+    INFNXPG013:
+      name: contents_corner
+      mqkey: sris_id,epsd_id
+      requestparam: sris_id,epsd_id
+      referencekey: epsd_id
+      path: /xpg/v5/contents/corner
+      isArray: false
+      itemIsString: false
+      isSingleKey: false
+      baseField: items.item
+      deleteField: corners[*]
+      checkField: sris_id,epsd_id,corners,cnr_grp_id,cnr_id,cnr_nm,epsd_rslu_id,img_path,wat_fr_byte_val,tmtag_fr_tmsc,sort_seq
+    INFNXPG014:
+      name: contents_review
+      mqkey: sris_id
+      requestparam: sris_id
+      referencekey: sris_id
+      path: /xpg/v5/contents/review
+      isArray: false
+      itemIsString: false
+      isSingleKey: false
+      baseField: items.item
+      deleteField:
+      checkField: sris_id,sites,btv_pnt_info,prize_history
+    INFNXPG015:
+      name: contents_purchares
+      mqkey: sris_id
+      requestparam: sris_id
+      referencekey: sris_id
+      path: /xpg/v5/contents/purchares
+      isArray: false
+      itemIsString: false
+      isSingleKey: false
+      baseField: items.item
+      deleteField:
+      checkField: sris_id,products,prd_prc_id,prd_typ_cd,asis_prd_typ_cd,possn_yn,lag_capt_typ_cd,rslu_typ_cd,purc_pref_rank,prd_prc,prd_prc_vat,sale_prc,sale_prc_vat,epsd_id,epsd_rslu_id,nscrn_yn,ppm_orgnz_fr_dt,ppm_orgnz_to_dt,next_prd_prc_fr_dt,prd_prc_fr_dt,prd_prc_to_dt,purc_wat_to_dt,use_yn
+    INFNXPG016:
+      name: contents_cidinfo
+      mqkey: sris_id,epsd_id,epsd_rslu_id
+      requestparam: sris_id,epsd_id,epsd_rslu_id
+      referencekey: epsd_rslu_id
+      path: /xpg/v5/contents/cidinfo
+      isArray: false
+      itemIsString: false
+      isSingleKey: true
+      baseField: items.item
+      deleteField:
+      checkField: epsd_rslu_id,epsd_id,sris_id,sris_typ_cd
+    INFNXPG017:
+      name: people_info
+      mqkey: prs_id
+      requestparam: prs_id
+      referencekey: prs_id
+      path: /xpg/v5/people/info
+      isArray: false
+      itemIsString: false
+      isSingleKey: false
+      baseField: items.item
+      deleteField:
+      checkField: prs_id,prs_nm,rnm,prs_eng_nm,job_nm,brth_ymd,death_dy,hght_val,wgt_val,blood_nm,dbu_cts,mngco_nm,filmogrps
+    INFNXPG018:
+      name: corner_gather
+      mqkey: cnr_grp_id
+      requestparam: cnr_grp_id
+      referencekey: cnr_grp_id
+      path: /xpg/v5/corner/gather
+      isArray: false
+      itemIsString: false
+      isSingleKey: false
+      baseField: items.item
+      deleteField:
+      checkField: cnr_grp_id
+    INFNXPG019:
+      name: menu_kidsGnb
+      mqkey: menu_stb_svc_id,version
+      requestparam: menu_stb_svc_id,version
+      referencekey: menu_stb_svc_id
+      path: /xpg/v5/menu/kidsGnb
+      isArray: true
+      itemIsString: false
+      isSingleKey: false
+      baseField: items.item
+      deleteField:
+      checkField: menu_id,menu_nm,call_typ_cd,call_url,menu_exps_prop_cd,lim_lvl_yn,kidsz_gnb_cd,dist_fr_dt,dist_to_dt
+    INFNXPG020:
+      name: menu_kidsCharacter
+      mqkey: menu_stb_svc_id,version
+      requestparam: menu_stb_svc_id,version
+      referencekey: menu_stb_svc_id
+      path: /xpg/v5/menu/kidsCharacter
+      isArray: true
+      itemIsString: false
+      isSingleKey: false
+      baseField: items.item
+      deleteField:
+      checkField: menu_id,menu_nm,call_typ_cd,call_url,menu_exps_prop_cd,lim_lvl_yn,kidsz_gnb_cd,blk_typ_cd,chrtr_nm,chrtr_expl,kids_age_cd,chrtr_fout_img,chrtr_fin1_img,chrtr_fin2_img,tot_chrtr_fout_img,chrtr_zon_sub_img,flag_fin_img,flag_fout_img,flag_new_img,block_types,chrtr_menu_cat_cd,cnts_typ_cd,shcut_epsd_id,shcut_sris_id,shcut_menu_id,synon_typ_cd,cw_call_id_val,vas_id,vas_svc_id,vas_itm_id,cmpgn_id,cmpgn_nm,cmpgn_fr_dt,cmpgn_to_dt,cmpgn_apl_fr_dt,cmpgn_apl_to_dt,cmpgn_itlk_typ_cd,sort_seq,dist_fr_dt,dist_to_dt
+    INFNXPG021:
+      name: synopsis_liveChildStory
+      mqkey: sris_id
+      requestparam: sris_id
+      referencekey: epsd_id
+      path: /xpg/v5/synopsis/liveChildStory
+      isArray: false
+      itemIsString: false
+      isSingleKey: false
+      baseField: items.item
+      deleteField:
+      checkField: sris_id,epsd_id,epsd_rslu_id,bg_img_path,poster_filename_v,title,sub_title,manuf_yr,pblsr_nm,writer,illustrator,play_tms_val,snss_cts,fstry_draw_exps_yn,fstry_role_plyg_exps_yn,fstry_spch_exps_yn,end_img_path,prd_typ_cd,asis_prd_typ_cd,prd_prc_id,prd_prc,prd_prc_vat,sale_prc,sale_prc_vat,meta_typ_cd
+    INFNXPG022:
+      name: epg_info
+      mqkey: 
+      requestparam: 
+      referencekey: epg
+      path: /xpg/v5/epg/genreChannelInfo
+      isArray: true
+      itemIsString: false
+      isSingleKey: true
+      baseField: items.item
+      deleteField:
+      checkField: total_count,newui_gnr_cd,newui_gnr_nm,channels,id_svc,no_ch,nm_ch,cd_area
+    INFNXPG023:
+      name: contents_phrase
+      mqkey: 
+      requestparam: 
+      referencekey: stb_exps_phrs_id
+      path: /xpg/v5/contents/phrase
+      isArray: false
+      itemIsString: false
+      isSingleKey: false
+      baseField: items.item
+      deleteField:
+      checkField: stb_exps_phrs_id,exps_phrs_title,exps_phrs_ctsc
+    INFNXPG024:
+      name: block_month
+      mqkey: menu_stb_svc_id
+      requestparam: menu_stb_svc_id
+      referencekey: menu_stb_svc_id
+      path: /xpg/v5/block/monthlyAmountBanner
+      isArray: true
+      itemIsString: false
+      isSingleKey: false
+      baseField: items.item
+      deleteField:
+      checkField: menu_id,menu_nm,call_typ_cd,call_url,menu_exps_prop_cd,scn_mthd_cd,svc_prop_cd,lim_lvl_yn,prd_prc_id,prd_nm,prd_prc,prd_prc_vat,sale_prc,sale_prc_vat,bnr_on_img_path,bnr_off_img_path,img_dist_yn,bnr_exps_mthd_cd,guide_phrs_use_yn,guide_phrs_nm,cnts_typ_cd,shcut_epsd_id,shcut_sris_id,shcut_menu_id,synon_typ_cd,cw_call_id_val,vas_id,vas_svc_id,vas_itm_id,gnb_typ_cd,cmpgn_id,cmpgn_nm,cmpgn_fr_dt,cmpgn_to_dt,cmpgn_apl_fr_dt,cmpgn_apl_to_dt,cmpgn_itlk_typ_cd,dist_fr_dt,dist_to_dt,low_rank_products
+    INFNXPG025:
+      name: synopsis_sris
+      mqkey: sris_id
+      requestparam: sris_id
+      referencekey: sris_id
+      path: /xpg/v5/synopsis/srisBasInfo
+      isArray: false
+      itemIsString: true
+      isSingleKey: false
+      baseField: items.item
+      deleteField:
+      checkField: sris_id,episodes,epsd_id,brcast_tseq_nm,poster_filename_h,poster_filename_v,cacbro_yn
+    INFNXPG026:
+      name: genre_info
+      mqkey: 
+      requestparam: 
+      referencekey: genre
+      path: /xpg/v5/epg/genreOrganInfo
+      isArray: true
+      itemIsString: false
+      isSingleKey: true
+      baseField: items.item
+      deleteField:
+      checkField: total_count,category_id,category_name,channels,service_id,channel_no,channel_name
+    INFNXPG029:
+      name: ending_cwcallidval
+      mqkey: 
+      requestparam: 
+      referencekey: ending_cwcallidval
+      path: /xpg/v5/contents/endingCwCallIdVal
+      isArray: false
+      itemIsString: true
+      isSingleKey: true
+      baseField: items.item
+      deleteField:
+      checkField: cw_call_id_val
+    INFNXPG030:
+      name: inside_info
+      mqkey: epsd_id
+      requestparam: epsd_id
+      referencekey: epsd_id
+      path: /xpg/v5/inside/epsdDeepMeta
+      isArray: false
+      itemIsString: true
+      isSingleKey: false
+      baseField: items.item
+      deleteField:
+      checkField: epsd_id,meta_id
+    INFNXPG031:
+      name: synopsis_contentsfiledetails
+      mqkey: epsd_id
+      requestparam: epsd_id
+      referencekey: epsd_id
+      path: /xpg/v5/synopsis/contentsfiledetails
+      isArray: false
+      itemIsString: true
+      isSingleKey: false
+      baseField: items.item
+      deleteField:
+      checkField: epsd_id,file_contents
+    INFNXPG032:
+      name: synopsis_ppmCommerce
+      mqkey: prd_prc_id
+      requestparam: prd_prc_id
+      referencekey: prd_prc_id
+      path: /xpg/v5/synopsis/ppmCommerce
+      isArray: false
+      itemIsString: true
+      isSingleKey: false
+      baseField: items.item
+      deleteField:
+      checkField: prd_prc_id,prd_typ_cd,asis_prd_typ_cd,purc_pref_rank,prd_prc,prd_prc_vat,sale_prc,sale_prc_vat,prd_prc_fr_dt,prd_prc_to_dt,purc_wat_to_dt,use_yn,rltn_prd_nm
+    INFNXPG033:
+      name: menu_lightHomeGnb
+      mqkey: menu_stb_svc_id
+      requestparam: menu_stb_svc_id
+      referencekey: menu_stb_svc_id
+      path: /xpg/v5/menu/lightHomeGnb
+      isArray: true
+      itemIsString: false
+      isSingleKey: false
+      baseField: items.item
+      deleteField:
+      checkField: menu_id,menu_nm,lim_lvl_yn,gnb_typ_cd,dist_fr_dt,dist_to_dt
+    INFNXPG034:
+      name: menu_miniHomeGnb
+      mqkey: menu_stb_svc_id
+      requestparam: menu_stb_svc_id
+      referencekey: menu_stb_svc_id
+      path: /xpg/v5/menu/MiniHomeGnb
+      isArray: true
+      itemIsString: false
+      isSingleKey: false
+      baseField: items.item
+      deleteField:
+      checkField: menu_id,menu_nm,lim_lvl_yn,gnb_typ_cd,dist_fr_dt,dist_to_dt,page_path

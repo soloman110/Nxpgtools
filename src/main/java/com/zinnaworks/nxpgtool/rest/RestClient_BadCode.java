@@ -2,7 +2,9 @@ package com.zinnaworks.nxpgtool.rest;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -13,7 +15,12 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.Base64;
+import java.util.HashMap;
 
+import org.apache.commons.httpclient.HttpException;
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
@@ -28,18 +35,30 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.UriComponentsBuilder;
 import org.thymeleaf.util.StringUtils;
 
 @Service
 public class RestClient_BadCode {
 
+	private static final Logger logger = LoggerFactory.getLogger(RestClient_BadCode.class);
+	
 	private int socktimeout = 5000;
-
 	private int conntimeout = 5000;
-
 	private int connreqtimeout = 5000;
 
+	@Value("${task.partial.user}")
+	private String ncmsPartialUser;
+	@Value("${task.partial.password}")
+	private String ncmsPartialPassword;
+	
+	MultiThreadedHttpConnectionManager connectionManager =  new MultiThreadedHttpConnectionManager();
+	private final org.apache.commons.httpclient.HttpClient client = new org.apache.commons.httpclient.HttpClient(connectionManager);
+	
 	public String apacheGet(String url, Map<String, String> reqparam) {
 
 		ExecutorService threadPool = Executors.newCachedThreadPool();
@@ -180,5 +199,73 @@ public class RestClient_BadCode {
 		while ((line = br.readLine()) != null) {
 			System.out.println("Response : \n" + result.append(line));
 		}
+	}
+
+	public Map<String, String> getRestUri(String uri, String param) {
+		String json = "";
+		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(uri);
+
+		if (param != null && builder != null) {
+
+			String[] arrKey = param.split(",");
+			if (arrKey != null && !param.isEmpty()) {
+				for (int y = 0; y < arrKey.length; y++) {
+					builder.queryParam(arrKey[y].replaceAll("(.*)\\|(.*)", "$1"), arrKey[y].replaceAll("(.*)\\|(.*)", "$2"));
+				}
+			}
+		}
+		
+		GetMethod method = new GetMethod(builder.build().encode().toUri().toString());
+		
+		String encoding;
+		try {
+			encoding = Base64.getEncoder().encodeToString((ncmsPartialUser + ":" + ncmsPartialPassword).getBytes("UTF-8"));
+			method.addRequestHeader("Authorization", "Basic " + encoding);
+		} catch (UnsupportedEncodingException e) {
+			logger.error("getRestUri Error " + e.toString());
+		}
+		
+		InputStream is = null;
+		BufferedReader br = null;
+		String line = null;
+		Map<String, String> restResult = new HashMap<String, String>();
+		
+		try {
+			// Execute the method.
+			logger.info("{\"param\":\"" + param + "\"}");
+			int statusCode = client.executeMethod(method);
+
+			if (statusCode != HttpStatus.SC_OK) {				
+				restResult.put("result", "FAIL");
+				restResult.put("status", statusCode + "");
+				restResult.put("json", "");
+				
+			} else {
+
+				restResult.put("result", "OK");
+				restResult.put("status", statusCode + "");
+				// Read the response body.
+				is = method.getResponseBodyAsStream();
+				
+				br = new BufferedReader(new InputStreamReader(is));
+	            while ((line = br.readLine()) != null) {
+	            	json += line;
+	            }
+				restResult.put("json", json);
+			}
+			
+			logger.info("{\"status\":\"" + statusCode + ",\"param\":\"" + param + "\"}");
+			
+		} catch (HttpException e) {
+			logger.error("getRestUri Error " + e.toString());
+		} catch (IOException e) {
+			logger.error("getRestUri Error " + e.toString());
+		} finally {
+			// Release the connection.
+			method.releaseConnection();
+		}
+		
+		return restResult;
+
 	}
 }
