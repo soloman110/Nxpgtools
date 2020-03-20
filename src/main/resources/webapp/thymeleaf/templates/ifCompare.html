@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<head><meta charset="utf-8" /></head>
+<style>
+#list h3 {
+	color: #229922;
+	padding: 0;
+	margin: 0;
+}
+
+#list 	input {
+	width: 240px;
+}
+
+#list	span {
+	font-family: Consolas;
+}
+
+#list	ul {
+	font-size: 0.9em;
+	border-left: 3px solid #4caf59;
+	background-color: #f2f2f2;
+	padding: 0 3px 0 30px;
+}
+
+#list	li {
+	display: block;
+	width: 800px;
+	/*border-left: 1px solid #ddd;
+		border-right: 1px solid #ddd;*/
+	border-bottom: 1px solid #ddd;
+	padding: 3px;
+}
+
+#list	li.top {
+	border-top: 1px solid #ddd;
+}
+
+#list	li b {
+	display: inline-block;
+	min-width: 160px;
+	border-right: 1px solid #ddd;
+	padding-right: 3px;
+}
+
+#list	li span {
+	display: inline-block;
+	padding-right: 3px;
+}
+
+#list	li a {
+	border-right: 1px solid #ddd;
+	display: inline-block;
+	padding-left: 3px;
+	width: 314px;
+}
+
+#list	li a.head {
+	font-weight: bold;
+}
+
+#list	li button {
+	
+}
+
+#list	.red {
+	color: red;
+}
+
+#list	.container {
+	position: absolute;
+	z-index: 3;
+	border-top: 2px solid #666;
+	background-color: #FFF;
+}
+
+#list	#link {
+	position: fixed;
+	top: 40px;
+	left: 400px;
+}
+
+#list	#link a {
+	border: 1px solid #aaa;
+	border-radius: 4px;
+	text-decoration: none;
+	padding: 2px;
+	color: #229922;
+}
+
+#list	#link a:hover {
+	background-color: #AAA;
+	text-decoration: none;
+	color: #FFF;
+}
+
+#indexPage h3 {
+	font-size: 18px;
+}
+</style>
+
+
+<style>
+pre {
+	outline: 1px solid #ccc;
+	padding: 5px;
+	margin: 5px;
+}
+
+.string {
+	color: green;
+}
+
+.number {
+	color: darkorange;
+}
+
+.boolean {
+	color: blue;
+}
+
+.null {
+	color: magenta;
+}
+
+.key {
+	color: red;
+}
+</style>
+
+<div class="row">
+	<div class="col-md-12">
+		<div id="list">
+			<ul id="indexPage">
+				<li>
+					<h3><i>INFNXPG001</i> (menu_gnb)</h3>
+					<br/><input type="hidden" value="menu_gnb" /><b><span>menu_stb_svc_id</span></b>
+					<input type="text" name="menu_stb_svc_id" value="BTVWEBV512" />
+					<button>조회</button>
+				</li>
+				<li>
+					<h3><i>INFNXPG002</i> (menu_all)</h3>
+					<br/><input type="hidden" value="menu_all" /><b><span>menu_stb_svc_id</span></b>
+					<input type="text" name="menu_stb_svc_id" value="BTVWEBV512" />
+					<button>조회</button>
+				</li>
+				<li>
+					<h3><i>INFNXPG003</i> (big_banner)</h3>
+					<br/><input type="hidden" value="menu_all" /><b><span>menu_stb_svc_id</span></b>
+					<input type="text" name="menu_stb_svc_id" value="BTVWEBV512" />
+					<br/><b><span>menu_id</span></b>
+					<input type="text" name="menu_id" value="NM1000000400" />
+					<button>조회</button>
+				</li>
+				<li>
+					<h3><i>INFNXPG004</i> (block_block)</h3>
+					<br/><input type="hidden" value="block_block" />
+					<b><span>menu_stb_svc_id</span></b><input type="text" name="menu_stb_svc_id" value="BTVWEBV512" />
+					<br/><b><span>menu_id</span></b><input type="text" name="menu_id" value="NM1000000400" />
+					<button>조회</button>
+				</li>
+				<li>
+					<h3><i>INFNXPG005</i> (grid_banner)</h3>
+					<br/><input type="hidden" value="grid_banner" />
+					<b><span>menu_stb_svc_id</span></b><input type="text" name="menu_stb_svc_id" value="BTVWEBV512" />
+					<br/><b><span>menu_id</span></b><input type="text" name="menu_id" value="NM1000126000" />
+					<button>조회</button>
+				</li>
+				<li>
+					<h3><i>INFNXPG006</i> (grid_contents)</h3>
+					<br/><input type="hidden" value="grid_contents" />
+					<b><span>menu_id</span></b><input type="text" name="menu_id" value="NM1000023640" />
+					<button>조회</button>
+				</li>
+				<li>
+					<h3><i>INFNXPG007</i> (synopsis_contents)</h3>
+					<br/><input type="hidden" value="synopsis_contents" />
+					<b><span>sris_id</span></b><input type="text" name="sris_id" value="CS11000408" />
+					<button>조회</button>
+				</li>
+				<li>
+					<h3><i>INFNXPG008</i> (synopsis_srisInfo)</h3>
+					<br/><input type="hidden" value="synopsis_srisInfo" />
+					<b><span>sris_id</span></b><input type="text" name="sris_id" value="CS02015617" />
+					<br/><b><span>epsd_id</span></b><input type="text" name="epsd_id" value="CE0000028420" />
+					<button>조회</button>
+				</li>
+				<li>
+					<h3><i>INFNXPG009</i> (synopsis_gateway)</h3>
+					<br/><input type="hidden" value="synopsis_gateway" />
+					<b><span>sris_id</span></b><input type="text" name="sris_id" value="CS02152774" />
+					<button>조회</button>
+				</li>
+				<li>
+					<h3><i>INFNXPG010</i> (synopsis_commerce)</h3>
+					<br/><input type="hidden" value="synopsis_commerce" />
+					<b><span>sris_id</span></b><input type="text" name="sris_id" value="CS02152482" />
+					<button>조회</button>
+				</li>
+				<li>
+					<h3><i>INFNXPG011</i> (contents_people)</h3>
+					<br/><input type="hidden" value="contents_people" />
+					<b><span>sris_id</span></b><input type="text" name="sris_id" value="CS02015617" />
+					<br/><b><span>epsd_id</span></b><input type="text" name="epsd_id" value="CE0000028420" />
+					<button>조회</button>
+				</li>
+				<li>
+					<h3><i>INFNXPG012</i> (contents_preview)</h3>
+					<br/><input type="hidden" value="contents_preview" />
+					<b><span>sris_id</span></b><input type="text" name="sris_id" value="CS02070710" />
+					<button>조회</button>
+				</li>
+				<li>
+					<h3><i>INFNXPG013</i> (contents_corner)</h3>
+					<br/><input type="hidden" value="contents_corner" />
+					<b><span>sris_id</span></b><input type="text" name="sris_id" value="CS02042083" />
+					<br/><b><span>epsd_id</span></b><input type="text" name="epsd_id" value="CE1000078197" />
+					<button>조회</button>
+				</li>
+				<li>
+					<h3><i>INFNXPG014</i> (contents_review)</h3>
+					<br/><input type="hidden" value="contents_review" />
+					<b><span>sris_id</span></b><input type="text" name="sris_id" value="CS02070710" />
+					<button>조회</button>
+				</li>
+				<li>
+					<h3><i>INFNXPG015</i> (contents_purchares)</h3>
+					<br/><input type="hidden" value="contents_purchares" />
+					<b><span>sris_id</span></b><input type="text" name="sris_id" value="CS02067879" />
+					<button>조회</button>
+				</li>
+				<li>
+					<h3><i>INFNXPG016</i> (contents_cidinfo)</h3>
+					<br/><input type="hidden" value="contents_cidinfo" />
+					<b><span>sris_id</span></b><input type="text" name="sris_id" value="CS02015617" />
+					<br/><b><span>epsd_id</span></b><input type="text" name="epsd_id" value="CE0000028420" />
+					<br/><b><span>epsd_rslu_id</span></b><input type="text" name="epsd_rslu_id" value="{8DD2B9F5-C2C6-11E7-9B3E-679C8998107E}" />
+					<button>조회</button>
+				</li>
+				<li>
+					<h3><i>INFNXPG017</i> (people_info)</h3>
+					<br/><input type="hidden" value="people_info" />
+					<b><span>prs_id</span></b><input type="text" name="prs_id" value="MP0000158888" />
+					<button>조회</button>
+				</li>
+				<li>
+					<h3><i>INFNXPG018</i> (corner_gather)</h3>
+					<br/><input type="hidden" value="corner_gather" />
+					<b><span>cnr_grp_id</span></b><input type="text" name="cnr_grp_id" value="CN1000001478" />
+					<button>조회</button>
+				</li>
+				<li>
+					<h3><i>INFNXPG019</i> (menu_kidsGnb)</h3>
+					<br/><input type="hidden" value="menu_kidsGnb" />
+					<b><span>menu_stb_svc_id</span></b><input type="text" name="menu_stb_svc_id" value="BTVWEBV512" />
+					<button>조회</button>
+				</li>
+				<li>
+					<h3><i>INFNXPG020</i> (menu_kidsCharacter)</h3>
+					<br/><input type="hidden" value="menu_kidsCharacter" />
+					<b><span>menu_stb_svc_id</span></b><input type="text" name="menu_stb_svc_id" value="BTVWEBV512" />
+					<button>조회</button>
+				</li>
+				<li>
+					<h3><i>INFNXPG021</i> (synopsis_liveChildStory)</h3>
+					<br/><input type="hidden" value="synopsis_liveChildStory" />
+					<b><span>sris_id</span></b><input type="text" name="sris_id" value="CS11005100" />
+					<br/><b><span>epsd_id</span></b><input type="text" name="epsd_id" value="CE1000080073" />
+					<button>조회</button>
+				</li>
+				<li>
+					<h3><i>INFNXPG022</i> (epg_info)</h3>
+					<br/><input type="hidden" value="epg_info" />
+					<b><span>epg</span></b><input type="text" name="epg" value="epg" />
+					<button>조회</button>
+				</li>
+				<li>
+					<h3><i>INFNXPG023</i> (contents_phrase)</h3>
+					<br/><input type="hidden" value="contents_phrase" />
+					<b><span>stb_exps_phrs_id</span></b><input type="text" name="stb_exps_phrs_id" value="AP1000000004" />
+					<button>조회</button>
+				</li>
+				<li>
+					<h3><i>INFNXPG024</i> (block_month)</h3>
+					<br/><input type="hidden" value="block_month" />
+					<b><span>menu_stb_svc_id</span></b><input type="text" name="menu_stb_svc_id" value="BTVWEBV512" />
+					<button>조회</button>
+				</li>
+				<li>
+					<h3><i>INFNXPG025</i> (synopsis_sris)</h3>
+					<br/><input type="hidden" value="synopsis_sris" />
+					<b><span>sris_id</span></b><input type="text" name="sris_id" value="CS02065597" />
+					<button>조회</button>
+				</li>
+				<li>
+					<h3><i>INFNXPG026</i> (genre_info)</h3>
+					<br/><input type="hidden" value="genre_info" />
+					<b><span>genre</span></b><input type="text" name="genre" value="genre" />
+					<button>조회</button>
+				</li>
+				<li>
+					<h3><i>INFNXPG029</i> (ending_cwcallidval)</h3>
+					<br/><input type="hidden" value="ending_cwcallidval" />
+					<b><span>ending_cwcallidval</span></b><input type="text" name="ending_cwcallidval" value="ending_cwcallidval" />
+					<button>조회</button>
+				</li>
+				<li>
+					<h3><i>INFNXPG030</i> (inside_info)</h3>
+					<br/><input type="hidden" value="inside_info" />
+					<b><span>epsd_id</span></b><input type="text" name="epsd_id" value="CE0001312199" />
+					<button>조회</button>
+				</li>
+				<li>
+					<h3><i>INFNXPG031</i> (synopsis_contentsfiledetails)</h3>
+					<br/><input type="hidden" value="synopsis_contentsfiledetails" />
+					<b><span>epsd_id</span></b><input type="text" name="epsd_id" value="CE1000332857" />
+					<button>조회</button>
+				</li>
+				<li>
+					<h3><i>INFNXPG032</i> (synopsis_ppmCommerce)</h3>
+					<br/><input type="hidden" value="synopsis_ppmCommerce" />
+					<b><span>prd_prc_id</span></b><input type="text" name="prd_prc_id" value="410731392" />
+					<button>조회</button>
+				</li>
+				<li>
+					<h3><i>INFNXPG033</i> (menu_lightHomeGnb)</h3>
+					<br/><input type="hidden" value="menu_lightHomeGnb" />
+					<b><span>menu_stb_svc_id</span></b><input type="text" name="menu_stb_svc_id" value="BTVWEBV512" />
+					<button>조회</button>
+				</li>
+				<li>
+					<h3><i>INFNXPG034</i> (menu_miniHomeGnb)</h3>
+					<br/><input type="hidden" value="menu_miniHomeGnb" />
+					<b><span>menu_stb_svc_id</span></b><input type="text" name="menu_stb_svc_id" value="BTVWEBV513" />
+					<button>조회</button>
+				</li>
+			</ul>
+		</div>
+	</div>
+
+	<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+		aria-labelledby="myModalLabel">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title" id="myModalLabel">新增</h4>
+				</div>
+
+				<div class="panel-body modal-body"
+					style="height: 800px; overflow: scroll">
+					<table style="width: 100%">
+						<tr valign="top">
+							<td width="45%">
+								Redis
+								<div style="text-align:left; border: 1px #000000; width: 280px; margin: 0 auto;"
+									contenteditable="true" >
+									<pre id="redis_data_div"></pre>
+								</div>
+							</td>
+							<td width="45%">
+								NCMS
+								<div style="text-align:left; border: 1px #000000; width: 280px; margin: 0 auto;"
+									contenteditable="true">
+									<pre id="ncms_data_div"></pre>
+								</div>
+							</td>
+						</tr>
+					</table>
+				</div>
+
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">
+						<span aria-hidden="true">닫기</span>
+					</button>
+					<button type="button" id="btn_submit" class="btn btn-primary"
+						data-dismiss="modal">
+						<span aria-hidden="true"></span>저장
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	String.prototype.trim = function (char, type) {
+	    if (char) {
+	        if (type == 'left') {
+	            return this.replace(new RegExp('^\\'+char+'+', 'g'), '');
+	        } else if (type == 'right') {
+	            return this.replace(new RegExp('\\'+char+'+$', 'g'), '');
+	        }
+	        return this.replace(new RegExp('^\\'+char+'+|\\'+char+'+$', 'g'), '');
+	    }
+	    return this.replace(/^\s+|\s+$/g, '');
+	};
+
+	$("#indexPage li button").click(function() {
+		/*<![CDATA[*/
+		var urlname = $(this).attr("id");
+		var span = $(this).parent().find("span");
+		
+		var field = $(this).parent().find("input[type=hidden]").val();
+		var ifname = $(this).parent().find("i").html();
+
+		var pathvariable = $(span[1]).text();
+		var vals = $(this).parent().find("input");
+		
+		var param = "ifname="+ifname;
+		for(var i in vals) {
+			if (vals[i].type == "text") {
+				param += "&"+vals[i].name+"="+$(vals[i]).val();
+			}
+		}
+		
+		//return;
+		$.ajax({
+			type : "get",//필수 
+			url : "/nxpgtool/ifcomparecheck?"+param,
+			async : false,
+			//enctype : "multipart/form-data",//필수 
+			//contentType : false,//필수 
+			//processData : false,//필수 
+			// dataType : "json",
+			success : function(data) {
+				var jObj = JSON.parse(data);
+				if (jObj.result == "0000") {
+					$("#myModalLabel").text("일치");
+					
+					var redisResult = JSON.stringify(JSON.parse(jObj.redisResult), null, 2);
+					$("#redis_data_div").html(redisResult);
+					var ncmsResult = JSON.stringify(JSON.parse(jObj.ncmsResult), null, 2);
+					$("#ncms_data_div").html(ncmsResult);
+					$('#myModal').modal();
+				} else if (jObj.result == "0002") {
+					$("#myModalLabel").text("불일치");
+					
+					var redisResult = JSON.stringify(JSON.parse(jObj.redisResult), null, 2);
+					$("#redis_data_div").html(redisResult);
+					var ncmsResult = JSON.stringify(JSON.parse(jObj.ncmsResult), null, 2);
+					$("#ncms_data_div").html(ncmsResult);
+					$('#myModal').modal();
+				} else {
+					alert("데이터 없음");
+				}
+
+			},
+			error : function(e) {
+				alert("데이터 없거나, 요청 실패");
+			}
+		});
+
+		/*]]>*/
+	});
+</script>

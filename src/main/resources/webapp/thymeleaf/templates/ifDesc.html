@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<head>
+<meta charset="utf-8" />
+</head>
+<style>
+#list h3 {
+	color: #229922;
+	padding: 0;
+	margin: 0;
+}
+
+#list 	input {
+	width: 240px;
+}
+
+#list	span {
+	font-family: Consolas;
+}
+
+#list	ul {
+	font-size: 0.9em;
+	border-left: 3px solid #4caf59;
+	background-color: #f2f2f2;
+	padding: 0 3px 0 30px;
+}
+
+#list	li {
+	display: block;
+	width: 800px;
+	/*border-left: 1px solid #ddd;
+		border-right: 1px solid #ddd;*/
+	border-bottom: 1px solid #ddd;
+	padding: 3px;
+}
+
+#list	li.top {
+	border-top: 1px solid #ddd;
+}
+
+#list	li b {
+	display: inline-block;
+	min-width: 160px;
+	border-right: 1px solid #ddd;
+	padding-right: 3px;
+}
+
+#list	li span {
+	display: inline-block;
+	padding-right: 3px;
+}
+
+#list	li a {
+	border-right: 1px solid #ddd;
+	display: inline-block;
+	padding-left: 3px;
+	width: 314px;
+}
+
+#list	li a.head {
+	font-weight: bold;
+}
+
+#list	li button {
+	
+}
+
+#list	.red {
+	color: red;
+}
+
+#list	.container {
+	position: absolute;
+	z-index: 3;
+	border-top: 2px solid #666;
+	background-color: #FFF;
+}
+
+#list	#link {
+	position: fixed;
+	top: 40px;
+	left: 400px;
+}
+
+#list	#link a {
+	border: 1px solid #aaa;
+	border-radius: 4px;
+	text-decoration: none;
+	padding: 2px;
+	color: #229922;
+}
+
+#list	#link a:hover {
+	background-color: #AAA;
+	text-decoration: none;
+	color: #FFF;
+}
+
+#indexPage h3 {
+	font-size: 18px;
+}
+</style>
+
+
+<style>
+pre {
+	outline: 1px solid #ccc;
+	padding: 5px;
+	margin: 5px;
+}
+
+.string {
+	color: green;
+}
+
+.number {
+	color: darkorange;
+}
+
+.boolean {
+	color: blue;
+}
+
+.null {
+	color: magenta;
+}
+
+.key {
+	color: red;
+}
+</style>
+
+<div class="row">
+	<div class="col-md-12">
+		<div id="list">
+			<input type="text" id="stb_id" value="%7B17E6CCA1-0A46-11E8-9252-FFA90356A7A9%7D" />
+			<ul id="indexPage">
+				<li>
+					<h3><i>IF-NXPG-001</i> (GNB 메뉴 정보)</h3>
+					<br/><b><span>menu_stb_svc_id</span></b><input type="text" name="menu_stb_svc_id" value="BTVWEBV512" />
+					<button>조회</button>
+				</li>
+				<li>
+					<h3><i>IF-NXPG-002</i> (전체 메뉴 정보)</h3>
+					<br/><b><span>menu_stb_svc_id</span></b><input type="text" name="menu_stb_svc_id" value="BTVWEBV512" />
+					<button>조회</button>
+				</li>
+				<li>
+					<h3><i>IF-NXPG-003</i> (블록 정보)</h3>
+					<b><span>menu_stb_svc_id</span></b><input type="text" name="menu_stb_svc_id" value="BTVWEBV512" />
+					<br/><b><span>menu_id</span></b><input type="text" name="menu_id" value="NM1000000400" />
+					<br/><b><span>seg_id</span></b><input type="text" name="seg_id" value="ACSTEST191202" />
+					<br/><b><span>bnr_seg_id</span></b><input type="text" name="bnr_seg_id" value="ACSTEST191202" />
+					<button>조회</button>
+				</li>
+				<li>
+					<h3><i>IF-NXPG-005</i> (월정액 가입자 메뉴 정보)</h3>
+					<b><span>menu_stb_svc_id</span></b><input type="text" name="menu_stb_svc_id" value="BTVWEBV512" />
+					<br/><b><span>menu_id</span></b><input type="text" name="menu_id" value="NM1000000100" />
+					<br/><b><span>prd_prc_id_lst</span></b><input type="text" name="prd_prc_id_lst" value="1017470" />
+					<button>조회</button>
+				</li>
+				<li>
+					<h3><i>IF-NXPG-006</i> (블록 별 그리드 정보)</h3>
+					<br/><b><span>menu_id</span></b><input type="text" name="menu_id" value="NM1000023792" />
+					<br/><b><span>page_no</span></b><input type="text" name="page_no" value="1" />
+					<br/><b><span>page_cnt</span></b><input type="text" name="page_cnt" value="9999" />
+					<button>조회</button>
+				</li>
+				<li>
+					<h3><i>IF-NXPG-007</i> (이벤트 정보)</h3>
+					<b><span>menu_stb_svc_id</span></b><input type="text" name="menu_stb_svc_id" value="BTVKIDS511" />
+					<br/><b><span>menu_id</span></b><input type="text" name="menu_id" value="NM1000128886" />
+					<br/><b><span>seg_id</span></b><input type="text" name="seg_id" value="MULTICBL03" />
+					<button>조회</button>
+				</li>
+				<li>
+					<h3><i>IF-NXPG-008</i> (평점 및 리뷰)</h3>
+					<br/><b><span>sris_id</span></b><input type="text" name="sris_id" value="CS02004109" />
+					<br/><b><span>site_cd</span></b><input type="text" name="site_cd" value="10" />
+					<br/><b><span>page_no</span></b><input type="text" name="page_no" value="1" />
+					<br/><b><span>page_cnt</span></b><input type="text" name="page_cnt" value="9999" />
+					<button>조회</button>
+				</li>
+				<li>
+					<h3><i>IF-NXPG-010</i> (시놉시스 search_type)</h3>
+					<input type="hidden" name="menu_stb_svc_id" value="BTVWEBV513" />
+					<br/><b><span>sris_id</span></b><input type="text" name="sris_id" value="CS02042083" />
+					<br/><b><span>epsd_id</span></b><input type="text" name="epsd_id" value="CE1000078197" />
+					<br/><b><span>epsd_rslu_id</span></b><input type="text" name="epsd_rslu_id" value="{17E6CCA1-0A46-11E8-9252-FFA90356A7A9}" />
+					<br/><b><span>search_type</span></b><input type="text" name="search_type" value="1" />
+					<br/><b><span>yn_recent</span></b><input type="text" name="yn_recent" value="N" />
+					<br/><b><span>cmc_yn</span></b><input type="text" name="cmc_yn" value="Y" />
+					<br/><b><span>ppm_yn</span></b><input type="text" name="ppm_yn" value="Y" />
+					<button>조회</button>
+				</li>
+			</ul>
+		</div>
+	</div>
+
+	<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+		aria-labelledby="myModalLabel">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title" id="myModalLabel">新增</h4>
+				</div>
+
+				<div class="panel-body modal-body"
+					style="height: 800px; overflow: scroll">
+					<table style="width: 100%">
+						<tr valign="top">
+							<td width="45%">
+								Redis
+								<div style="text-align:left; border: 1px #000000; width: 280px; margin: 0 auto;"
+									contenteditable="true" >
+									<pre id="redis_data_div"></pre>
+								</div>
+							</td>
+							<td width="45%">
+								NCMS
+								<div style="text-align:left; border: 1px #000000; width: 280px; margin: 0 auto;"
+									contenteditable="true">
+									<pre id="ncms_data_div"></pre>
+								</div>
+							</td>
+						</tr>
+					</table>
+				</div>
+
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">
+						<span aria-hidden="true">닫기</span>
+					</button>
+					<button type="button" id="btn_submit" class="btn btn-primary"
+						data-dismiss="modal">
+						<span aria-hidden="true"></span>저장
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<form name="frm" method="get" target="_blank">
+</form>
+
+<script>
+	String.prototype.trim = function (char, type) {
+	    if (char) {
+	        if (type == 'left') {
+	            return this.replace(new RegExp('^\\'+char+'+', 'g'), '');
+	        } else if (type == 'right') {
+	            return this.replace(new RegExp('\\'+char+'+$', 'g'), '');
+	        }
+	        return this.replace(new RegExp('^\\'+char+'+|\\'+char+'+$', 'g'), '');
+	    }
+	    return this.replace(/^\s+|\s+$/g, '');
+	};
+
+	$("#indexPage li button").click(function() {
+		/*<![CDATA[*/
+		var urlname = $(this).attr("id");
+		var span = $(this).parent().find("span");
+		
+		var field = $(this).parent().find("input[type=hidden]").val();
+		var ifname = $(this).parent().find("i").html();
+
+		var pathvariable = $(span[1]).text();
+		var vals = $(this).parent().find("input");
+		
+		var param = "ifname="+ifname;
+		for(var i in vals) {
+			if (vals[i].type == "text" || vals[i].type == "hidden") {
+				param += "&"+vals[i].name+"="+$(vals[i]).val();
+			}
+		}
+		
+		param += "&stb_id="+$("#stb_id").val();
+		
+		window.open("/nxpgtool/ifdesccheck?"+param, "_blank");
+		/*]]>*/
+	});
+</script>
