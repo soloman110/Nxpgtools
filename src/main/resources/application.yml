@@ -35,7 +35,32 @@ user:
     IF-NXPG-003:
       path: /v5/menu/block
       api: INFNXPG003|banners,INFNXPG004|blocks
-      requestparam: stb_id,menu_stb_svc_id,menu_id
+      requestparam: stb_id,menu_stb_svc_id,menu_id,seg_id,bnr_seg_id
+      processing:
+    IF-NXPG-005:
+      path: /v5/menu/month
+      api: INFNXPG003|banners,INFNXPG004|blocks
+      requestparam: stb_id,menu_stb_svc_id,menu_id,prd_prc_id_lst
+      processing: i_img_cd
+    IF-NXPG-006:
+      path: /v5/grid/grid
+      api: INFNXPG006|contents
+      requestparam: stb_id,menu_id,page_no,page_cnt
+      processing: i_img_cd
+    IF-NXPG-007:
+      path: /v5/grid/event
+      api: INFNXPG005|banners
+      requestparam: stb_id,menu_stb_svc_id,menu_id,seg_id
+      processing:
+    IF-NXPG-008:
+      path: /v5/contents/rating
+      api: INFNXPG014|menus
+      requestparam: stb_id,sris_id,site_cd,page_no,page_cnt
+      processing:
+    IF-NXPG-010:
+      path: /v5/contents/synopsis
+      api: INFNXPG007|contents
+      requestparam: stb_id,menu_stb_svc_id,sris_id,epsd_id,epsd_rslu_id,search_type,yn_recent,ppm_yn,cmc_yn
       processing:
   collections:
     INFNXPG001:
@@ -65,7 +90,7 @@ user:
     INFNXPG003:
       name: big_banner
       mqkey: menu_stb_svc_id,menu_id
-      requestparam: menu_stb_svc_id,menu_id,bnr_seg_id
+      requestparam: menu_stb_svc_id,menu_id
       referencekey: menu_stb_svc_id,menu_id
       path: /xpg/v5/block/bigBanner
       isArray: false
@@ -77,7 +102,7 @@ user:
     INFNXPG004:
       name: block_block
       mqkey: menu_stb_svc_id,menu_id
-      requestparam: menu_stb_svc_id,menu_id,seg_id
+      requestparam: menu_stb_svc_id,menu_id
       referencekey: menu_stb_svc_id,menu_id
       path: /xpg/v5/block/block
       isArray: false
@@ -96,8 +121,8 @@ user:
       itemIsString: true
       isSingleKey: false
       baseField: items.item
-      deleteField: banners[*]
-      checkField: menu_id,total_count,version,banners,menu_id,menu_nm,call_typ_cd,call_url,menu_exps_prop_cd,scn_mthd_cd,svc_prop_cd,lim_lvl_yn,prd_typ_cd,asis_prd_typ_cd,is_compound_prd,prd_prc_id,prd_prc,prd_prc_vat,sale_prc,sale_prc_vat,img_dist_yn,bnr_det_typ_cd,bnr_exps_mthd_cd,bnr_on_img_path,bnr_off_img_path,bnr_expl,cnts_typ_cd,mmtf_home_exps_yn,shcut_epsd_id,shcut_sris_id,shcut_menu_id,synon_typ_cd,cw_call_id_val,vas_id,vas_svc_id,vas_itm_id,gnb_typ_cd,cmpgn_id,cmpgn_nm,cmpgn_fr_dt,cmpgn_to_dt,cmpgn_apl_fr_dt,cmpgn_apl_to_dt,cmpgn_itlk_typ_cd,dist_fr_dt,dist_to_dt,uguid_typ_cd,uguid_title,uguid_expl,guide_imgs,uguid_epsd_rslu_id
+      datefilter: dist_fr_dt|dist_to_dt
+      segment: cmpgn_id|seg_id
     INFNXPG006:
       name: grid_contents
       mqkey: menu_id
@@ -108,8 +133,8 @@ user:
       itemIsString: true
       isSingleKey: false
       baseField: items.item
-      deleteField:
-      checkField: menu_id,total_count,contents,sris_id,sort_seq,brcast_tseq_nm,title,epsd_id,synon_typ_cd,wat_lvl_cd,adlt_lvl_cd,badge_typ_nm,bas_badge_img_path,user_badge_img_path,user_badge_wdt_img_path,icon_exps_fr_dt,icon_exps_to_dt,poster_filename_h,poster_filename_v,meta_typ_cd,kids_yn,svc_fr_dt,svc_to_dt,sris_dist_fir_svc_dt,epsd_dist_fir_svc_dt,cacbro_yn,rslu_typ_cd,sale_prc
+      datefilter: svc_fr_dt|svc_to_dt
+      segment:
     INFNXPG007:
       name: synopsis_contents
       mqkey: sris_id
@@ -120,8 +145,8 @@ user:
       itemIsString: false
       isSingleKey: false
       baseField: items.item
-      deleteField:
-      checkField: sris_id,bg_img_path,dark_img_yn,poss_bg_img,sris_typ_cd,title_img_path,title,meta_title_colr_val,open_yr,meta_typ_cd,svc_fr_dt,svc_to_dt,sris_poster_filename_h,sris_poster_filename_v,sris_snss_cts,sris_sales_comt_exps_mthd_cd,sris_sales_comt_cts,sris_sales_comt_img_path,sris_sales_comt_call_typ_cd,sris_sales_comt_call_objt_id,sris_sales_vas_svc_id,sris_sales_vas_itm_id,sris_sales_comt_call_url,sris_evt_comt_exps_mthd_cd,sris_evt_comt_cts,sris_evt_comt_img_path,sris_evt_comt_call_typ_cd,sris_evt_comt_call_objt_id,sris_evt_vas_svc_id,sris_evt_vas_itm_id,sris_evt_comt_call_url,aprc_pt_cts,aprc_pt_cts_colr_val,sson_choic_nm,prev_sris_id,prev_epsd_id,next_sris_id,next_epsd_id,kids_yn
+      datefilter: 
+      segment: 
     INFNXPG008:
       name: synopsis_srisInfo
       mqkey: sris_id,epsd_id

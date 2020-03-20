@@ -147,11 +147,11 @@ public final class JsonUtil {
 	private static Map<String, String> setDesc(String nxpg, String tag, String nxpgValue, String ncms, String ncmsValue,
 			boolean sync, boolean byPass) {
 		Map<String, String> result = new HashMap<String, String>();
-		result.put("nxpg", nxpg);
-		result.put("tag", tag);
-		result.put("nxpgValue", nxpgValue);
-		result.put("ncms", ncms);
-		result.put("ncmsValue", ncmsValue);
+		result.put("nxpg", StrUtil.getValue(nxpg));
+		result.put("tag", StrUtil.getValue(tag));
+		result.put("nxpgValue", StrUtil.getValue(nxpgValue));
+		result.put("ncms", StrUtil.getValue(ncms));
+		result.put("ncmsValue", StrUtil.getValue(ncmsValue));
 
 		if (sync)
 			result.put("sync", "Y");
@@ -184,7 +184,8 @@ public final class JsonUtil {
 			String[] datefilter = CastUtils.getObjectToMap(properties.getCollections().get(ncms)).get("datefilter").toString().split(",");
 			for (int i = 0; i < datefilter.length; i++) {
 				String[] filter = datefilter[i].split("\\|");
-				DateUtils.getCompare(list, filter[0], filter[1], true);
+				if (filter.length == 2)
+					DateUtils.getCompare(list, filter[0], filter[1], true);
 			}
 		} catch (Exception e) {
 			System.out.println("Date Filter Error : " + e.toString());
@@ -195,11 +196,15 @@ public final class JsonUtil {
 		// sample : cmpgn_id|seg_id
 		try {
 			String[] segment = CastUtils.getObjectToMap(properties.getCollections().get(ncms)).get("segment").toString().split("\\|");
-			if (segment.length == 2) {
+			
+			// IF-NXPG-005는 segment 필터링을 뺸다
+			if ("IF-NXPG-005".equals(param.get("ifname"))) segment = null;
+			
+			if (segment != null && segment.length == 2) {
 				doSegment(list, param.get(segment[1]), segment[0]);
 			}
 		} catch (Exception e) {
-			System.out.println("Date Filter Error : " + e.toString());
+			System.out.println("Segment Filter Error : " + e.toString());
 		}
 		///////////////////
 
@@ -207,7 +212,7 @@ public final class JsonUtil {
 		try {
 			for (int i = 0; i < jArr1.length(); i++) {
 				if (jArr1.get(i) instanceof JSONObject) {
-					resultList.add(setDesc(i+1+"", "", "", "", "", false, false));
+					resultList.add(setDesc(nxpgPreKey + "-" + jArr1.length()+"("+(i+1)+")", "", "", "", "", true, true));
 					descJSONObject(properties, nxpgPreKey, param, ncms, resultList, jArr1.getJSONObject(i),
 							jArrNcms.getJSONObject(i));
 				} else {
@@ -218,7 +223,7 @@ public final class JsonUtil {
 				}
 			}
 		} catch (Exception e) {
-
+			System.out.println("descJSONArray Error : " + e.toString());
 		}
 	}
 
@@ -229,19 +234,35 @@ public final class JsonUtil {
 			return;
 		if (jObj2 == null)
 			return;
-
+		String key = null;
 		try {
 			Iterator<String> keyList = jObj1.keys();
 			while (keyList.hasNext()) {
-				String key = keyList.next();
+				key = keyList.next();
+
 				if (jObj1.get(key) instanceof JSONObject) {
 					descJSONObject(properties, nxpgPreKey + "." + key, param, ncms, resultList,
 							jObj1.getJSONObject(key), jObj2.getJSONObject(key));
 				} else if (jObj1.get(key) instanceof JSONArray) {
-					descJSONArray(properties, nxpgPreKey + "." + key, param, ncms, resultList, jObj1.getJSONArray(key),
-							jObj2.getJSONArray(key));
+					// 만약 ncms에 값이 없으면 nxpg에 있는 menu의 크기를 찍어준다.
+					if (jObj2.has(key)) {
+						if (jObj2.get(key) instanceof JSONArray) {
+							descJSONArray(properties, nxpgPreKey + "." + key, param, ncms, resultList, jObj1.getJSONArray(key), jObj2.getJSONArray(key));
+						} else {
+							resultList.add(setDesc(key + " count :" + jObj1.getJSONArray(key).length(), "", "", "", "", true, true));
+						}
+					} else {
+						resultList.add(setDesc(key + " count :" + jObj1.getJSONArray(key).length(), "", "", "", "", true, true));
+					}
 				} else {
 					boolean sync = true;
+					String nxpgValue = null;
+					String ncmsValue = null;
+										
+					nxpgValue = CastUtils.getStringToJSONObject(jObj1, key);
+					ncmsValue = CastUtils.getStringToJSONObject(jObj2, key);
+					
+					/*
 					if (jObj1.get(key) instanceof Double) {
 						if (jObj1.getDouble(key) != jObj2.getDouble(key))
 							sync = false;
@@ -249,18 +270,25 @@ public final class JsonUtil {
 						if (jObj1.getInt(key) != jObj2.getInt(key))
 							sync = false;
 					} else {
-						sync = jObj1.get(key).equals(jObj2.get(key));
+					}
+					*/
+					if (nxpgValue == null) {
+						if (ncmsValue != null) {
+							sync = false;
+						}
+					} else {
+						sync = nxpgValue.equals(ncmsValue);
 					}
 					if (sync == false)
-						System.out.println(jObj1.get(key).toString() + " " + jObj2.get(key).toString());
+						System.out.println("key : " + key + " nxpg : " + nxpgValue + " ncms : " + ncmsValue);
 
 					boolean byPass = properties.checkByPass(param.get("ifname").toString(), key);
 					resultList.add(setDesc(param.get("ifname").toString(), nxpgPreKey + "." + key,
-							jObj1.get(key).toString(), ncms, jObj2.get(key).toString(), sync, byPass));
+							nxpgValue, ncms, ncmsValue, sync, byPass));
 				}
 			}
 		} catch (Exception e) {
-
+			System.out.println("descJSONObject Error : " + key + " - " + e.toString());
 		}
 	}
 
@@ -322,7 +350,7 @@ public final class JsonUtil {
 
 		return result;
 	}
-
+	
 	public static void doSegment(List<Map<String, Object>> menuList, String segmentId, String field_campaign) {
 		// menu_cd 제거
 		List<Map<String, Object>> deleteListInner = new ArrayList<Map<String, Object>>();
@@ -366,5 +394,4 @@ public final class JsonUtil {
 			}
 		}
 	}
-
 }

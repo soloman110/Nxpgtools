@@ -118,9 +118,9 @@ public class IFController {
 	  			cell = row.createCell(cellIndex++); cell.setCellValue(result.get("byPass"));
 	    	}
 
-		response.setHeader("Set-Cookie", "fileDownload=true; path=/");
-		response.setHeader("Content-Disposition", String.format("attachment; filename=\""+ param.get("ifname").toString() +".xlsx\""));
-		wb.write(response.getOutputStream());
+			response.setHeader("Set-Cookie", "fileDownload=true; path=/");
+			response.setHeader("Content-Disposition", String.format("attachment; filename=\""+ param.get("ifname").toString() +".xlsx\""));
+			wb.write(response.getOutputStream());
 
 	    } catch(Exception e) {
 	        response.setHeader("Set-Cookie", "fileDownload=false; path=/");

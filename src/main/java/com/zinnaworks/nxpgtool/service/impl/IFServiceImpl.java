@@ -25,6 +25,7 @@ import com.zinnaworks.nxpgtool.config.CollectionProperties;
 import com.zinnaworks.nxpgtool.exception.DataNotValidException;
 import com.zinnaworks.nxpgtool.exception.FileStorageException;
 import com.zinnaworks.nxpgtool.rest.RestClient_BadCode;
+import com.zinnaworks.nxpgtool.service.FilterService;
 import com.zinnaworks.nxpgtool.service.IFService;
 import com.zinnaworks.nxpgtool.util.CastUtils;
 import com.zinnaworks.nxpgtool.util.JsonUtil;
@@ -41,6 +42,9 @@ public class IFServiceImpl implements IFService {
 	
 	@Autowired
 	RestClient_BadCode client;
+	
+	@Autowired
+	FilterService filterService;
 	
 	@Value("${task.partial.url}")
 	private String ncmsPartialUrl;
@@ -120,6 +124,32 @@ public class IFServiceImpl implements IFService {
 			String ncmsResult = getNcmsData(ncmsParam);
 			if (ncmsResult == null || ncmsResult.isEmpty()) return resultList;
 			
+			// 각종 로직 별 필터링 추가.
+			if ("INFNXPG004".equals(tempApi[0])) {
+				Map<String, Object> item = CastUtils.StringToJsonMap(ncmsResult);
+				if ("IF-NXPG-005".equals(param.get("ifname")))
+					filterService.filterINFNXPG004Month(param, item);
+				else 
+					item = filterService.filterINFNXPG004(ncmsParam, false, item);
+				ncmsResult = new JSONObject(item).toString();
+			}
+			if ("INFNXPG005".equals(tempApi[0])) {
+				Map<String, Object> item = CastUtils.StringToJsonMap(ncmsResult);
+				item = filterService.filterINFNXPG005(item);
+				ncmsResult = new JSONObject(item).toString();
+			}
+			if ("INFNXPG006".equals(tempApi[0])) {
+				Map<String, Object> item = CastUtils.StringToJsonMap(ncmsResult);
+				item = filterService.filterINFNXPG006(item);
+				ncmsResult = new JSONObject(item).toString();
+			}
+			if ("INFNXPG014".equals(tempApi[0])) {
+				Map<String, Object> item = CastUtils.StringToJsonMap(ncmsResult);
+				filterService.filterINFNXPG014(param, item);
+				ncmsResult = new JSONObject(item).toString();
+			}
+			//////////////////////////////////
+			
 			// 데이터 비교.
 			if (jNxpg.has(tempApi[1])) {
 				if (isArray) 
@@ -128,7 +158,7 @@ public class IFServiceImpl implements IFService {
 					if (jNxpg.get(tempApi[1]) instanceof JSONArray) {
 						JsonUtil.descJSONArray(collectionProperties, tempApi[1], param, tempApi[0], resultList, jNxpg.getJSONArray(tempApi[1]), new JSONObject(ncmsResult).getJSONArray(tempApi[1]));
 					} else {
-					JsonUtil.descJSONObject(collectionProperties, tempApi[1], param, tempApi[0], resultList, jNxpg.getJSONObject(tempApi[1]), new JSONObject(ncmsResult).getJSONObject(tempApi[1]));
+						JsonUtil.descJSONObject(collectionProperties, tempApi[1], param, tempApi[0], resultList, jNxpg.getJSONObject(tempApi[1]), new JSONObject(ncmsResult));
 					}
 				}
 			}	
@@ -145,7 +175,6 @@ public class IFServiceImpl implements IFService {
 		String url = "";
 		String value = "";
 		
-
 		try {
 			for (int i = 0; i < requestparam.length; i++) {
 				if (i == 0) value = requestparam[i]+"="+URLEncoder.encode(param.get(requestparam[i]), "UTF-8");
@@ -161,6 +190,7 @@ public class IFServiceImpl implements IFService {
 		return result;
 	}
 	
+	@Override
 	public String getNcmsData(Map<String, String> param) {
 		Map<String, Object> keyAndName = CastUtils.getObjectToMap(collectionProperties.getCollections().get(param.get("ifname"))); 
 		String[] referencekey = keyAndName.get("referencekey").toString().split(",");
@@ -289,6 +319,5 @@ public class IFServiceImpl implements IFService {
 		jResult.put("ncmsResult", ncmsResult);
 		
 		return jResult.toString();
-		
 	}
 }

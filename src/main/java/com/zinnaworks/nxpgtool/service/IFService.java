@@ -14,4 +14,5 @@ public interface IFService {
 	
 	public String compareInterface(Map<String, String> param);
 	public List<Map<String, String>> descInterface(Map<String, String> param);
+	public String getNcmsData(Map<String, String> param);
 }
