@@ -8,4 +8,9 @@ public interface FilterService {
 	public Map<String, Object> filterINFNXPG005(Map<String, Object> event);
 	public Map<String, Object> filterINFNXPG006(Map<String, Object> grid);
 	public void filterINFNXPG014(Map<String, String> param, Map<String, Object> review);
+	public void filterINFNXPG007(Map<String, String> param, Map<String, Object> contents);
+	public void filterINFNXPG015(Map<String, String> param, Map<String, Object> purchares);
+	public void filterINFNXPG009(Map<String, String> param, Map<String, Object> gwsynop);
+	public void filterINFNXPG010(Map<String, String> param, Map<String, Object> commerce);
+	public void filterINFNXPG032(Map<String, String> param, Map<String, Object> ppmCommerce);
 }

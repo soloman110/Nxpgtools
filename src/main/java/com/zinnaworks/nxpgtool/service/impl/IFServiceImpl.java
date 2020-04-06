@@ -148,6 +148,39 @@ public class IFServiceImpl implements IFService {
 				filterService.filterINFNXPG014(param, item);
 				ncmsResult = new JSONObject(item).toString();
 			}
+			
+			// 시놉시스
+			if ("INFNXPG007".equals(tempApi[0])) {
+				Map<String, Object> item = CastUtils.StringToJsonMap(ncmsResult);
+				filterService.filterINFNXPG007(param, item);
+				ncmsResult = new JSONObject(item).toString();
+			}
+			if ("INFNXPG015".equals(tempApi[0])) {
+				Map<String, Object> item = CastUtils.StringToJsonMap(ncmsResult);
+				filterService.filterINFNXPG015(param, item);
+				ncmsResult = new JSONObject(item).toString();
+			}
+			
+			// 게이트웨이 시놉시스
+			if ("INFNXPG009".equals(tempApi[0])) {
+				Map<String, Object> item = CastUtils.StringToJsonMap(ncmsResult);
+				filterService.filterINFNXPG009(param, item);
+				ncmsResult = new JSONObject(item).toString();
+			}
+			
+			// VOD+관련상품 시놉시스
+			if ("INFNXPG010".equals(tempApi[0])) {
+				Map<String, Object> item = CastUtils.StringToJsonMap(ncmsResult);
+				filterService.filterINFNXPG010(param, item);
+				ncmsResult = new JSONObject(item).toString();
+			}
+			
+			// PPM+관련상품 시놉시스
+			if ("INFNXPG032".equals(tempApi[0])) {
+				Map<String, Object> item = CastUtils.StringToJsonMap(ncmsResult);
+				filterService.filterINFNXPG032(param, item);
+				ncmsResult = new JSONObject(item).toString();
+			}
 			//////////////////////////////////
 			
 			// 데이터 비교.
@@ -157,8 +190,10 @@ public class IFServiceImpl implements IFService {
 				else {
 					if (jNxpg.get(tempApi[1]) instanceof JSONArray) {
 						JsonUtil.descJSONArray(collectionProperties, tempApi[1], param, tempApi[0], resultList, jNxpg.getJSONArray(tempApi[1]), new JSONObject(ncmsResult).getJSONArray(tempApi[1]));
-					} else {
+					} else if (jNxpg.get(tempApi[1]) instanceof JSONObject) {
 						JsonUtil.descJSONObject(collectionProperties, tempApi[1], param, tempApi[0], resultList, jNxpg.getJSONObject(tempApi[1]), new JSONObject(ncmsResult));
+					} else {
+						JsonUtil.descJSONObject(collectionProperties, tempApi[1], param, tempApi[0], resultList, jNxpg, new JSONObject(ncmsResult));
 					}
 				}
 			}	
@@ -245,16 +280,21 @@ public class IFServiceImpl implements IFService {
 				for (int i = 0; i < jsonArray.length(); i++) {
 					JSONObject jsonObject = CastUtils.getObjectToJSONObject(jsonArray.get(i));
 					for (int j = 0; j < referencekey.length; j++) {
-						String paramValue = param.get(referencekey[j]).toString();
-						String ncmsValue = jsonObject.getString(referencekey[j]);
-						if (paramValue.equals(ncmsValue)) {
-							result = jsonObject.toString();
-							break;
+						if (param.containsKey(referencekey[j])) {
+							String paramValue = param.get(referencekey[j]).toString();
+							String ncmsValue = jsonObject.getString(referencekey[j]);
+							if (paramValue.equals(ncmsValue)) {
+								result = jsonObject.toString();
+								break;
+							}
 						}
 					}
 					if ("".equals(result) == false) {
 						break;
 					}
+				}
+				if ("".equals(result)) {
+					result = jsonArray.toString();
 				}
 			} else if(item.get("item") instanceof Map) {
 				JSONObject jsonObject = new JSONObject(CastUtils.getObjectToMap(item.get("item")));

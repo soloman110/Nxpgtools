@@ -10,13 +10,18 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.zinnaworks.nxpgtool.config.CollectionProperties;
+import com.zinnaworks.nxpgtool.inspect.InspectHandler;
+import com.zinnaworks.nxpgtool.inspect.InspectStrategys;
 import com.zinnaworks.nxpgtool.service.FilterService;
 import com.zinnaworks.nxpgtool.service.IFService;
 import com.zinnaworks.nxpgtool.util.CastUtils;
@@ -26,9 +31,403 @@ import com.zinnaworks.nxpgtool.util.JsonUtil;
 @Service
 public class FilterServiceImpl implements FilterService {
 
+	private static String commerceProduct = "42";
+	private static String ppmProduct = "36";
+	
 	@Autowired
 	IFService ifService;
 
+	@Autowired
+	private CollectionProperties collectionProperties;
+
+	private Map<String, Object> getSynopsisSrisInfo(Map<String, String> param, String epsd_id) {
+		Map<String, Object> result = null;
+		Map<String, String> ncmsParam = new HashMap<String, String>(param);
+		ncmsParam.put("ifname", "INFNXPG008");
+		ncmsParam.put("epsd_id", epsd_id);
+		String ncmsResult = ifService.getNcmsData(ncmsParam);
+		
+		result = CastUtils.StringToJsonMap(ncmsResult);
+
+		InspectHandler.handle(result, InspectStrategys.INFNXPG008, param);
+		
+		return result;
+	}
+	
+	private List<Map<String, Object>> getContentsSeries(Map<String, String> param) {
+		Map<String, String> ncmsParam = new HashMap<String, String>(param);
+		ncmsParam.put("ifname", "INFNXPG025");
+		String result = ifService.getNcmsData(ncmsParam);
+		
+		Map<String, Object> temp = CastUtils.StringToJsonMap(result);
+		if (temp != null && temp.get("episodes") != null) {
+			
+			List<Map<String, Object>> seriesList = new ArrayList<Map<String, Object>>();
+			seriesList = CastUtils.getObjectToMapList(temp.get("episodes"));
+			InspectHandler.handle(seriesList, InspectStrategys.INFNXPG025, param);
+			//필터링
+			DateUtils.getCompare(seriesList, "svc_fr_dt", "svc_to_dt", false);
+			
+			return seriesList;
+		}
+		return null;
+	}
+
+	// 인물정보 가지고 오기.
+	public void getContentsPeople(Map<String, Object> contents, String epsd_id, Map<String, String> param) {
+		Map<String, String> ncmsParam = new HashMap<String, String>(param);
+		ncmsParam.put("ifname", "INFNXPG011");
+		ncmsParam.put("epsd_id", epsd_id);
+		String result = ifService.getNcmsData(ncmsParam);
+		
+		if (result != null && !"".equals(result)) {
+			contents.putAll(CastUtils.StringToJsonMap(result));
+		} else {
+			contents.put("peoples", null);
+		}
+	}
+
+	// 코너 정보 가지고 오기.
+	public void getContentsCorner(Map<String, Object> contents, String epsd_id, Map<String, String> param) {
+		Map<String, String> ncmsParam = new HashMap<String, String>(param);
+		ncmsParam.put("ifname", "INFNXPG011");
+		ncmsParam.put("epsd_id", epsd_id);
+		String result = ifService.getNcmsData(ncmsParam);
+		
+		if(result != null && !"".equals(result)) {
+			contents.putAll(CastUtils.StringToJsonMap(result));
+		}else {
+			contents.put("corners", null);
+		}
+	}	
+
+	// 예고편/스틸컷/스페셜영상 정보					
+	public Map<String, Object> getContentsPreview(Map<String, Object> contents, String sris_id, Map<String, String> param) {
+		Map<String, String> ncmsParam = new HashMap<String, String>(param);
+		ncmsParam.put("ifname", "INFNXPG012");
+		String result = ifService.getNcmsData(ncmsParam);
+		
+		if (result != null && !"".equals(result)) {
+			Map<String, Object> preview = CastUtils.StringToJsonMap(result);
+			InspectHandler.handle(preview, InspectStrategys.INFNXPG012, param);
+			contents.putAll(preview);
+		} else {
+			contents.put("preview", null);
+		}
+		
+		return contents;
+	}	
+	
+	// 평점/리뷰 정보
+	public void getContentsReview(Map<String, Object> contents, String sris_id, Map<String, String> param) {
+		Map<String, String> ncmsParam = new HashMap<String, String>(param);
+		ncmsParam.put("ifname", "INFNXPG014");
+		String result = ifService.getNcmsData(ncmsParam);
+		
+		Map<String, Object> root = null;
+		if (result != null && !"".equals(result)) {
+			root = CastUtils.StringToJsonMap(result);
+
+			Map<String, Object> temp = null;
+			List<Map<String, Object>> sites = CastUtils.getObjectToMapList(root.get("sites"));
+
+			for (Map<String, Object> site : sites) {
+				temp = null;
+				List<Map<String, Object>> reviews = CastUtils.getObjectToMapList(site.get("reviews"));
+				if (reviews != null && reviews.size() > 0) {
+					temp = reviews.get(0);
+				}
+				List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+				if (temp != null) {
+					list.add(temp);
+				}
+				site.put("reviews", list);
+			}
+
+			contents.put("site_review", root);
+		} else {
+			contents.put("site_review", null);
+		}
+	}
+	
+
+	@Override
+	// 게이트웨이 시놉시스
+	public void filterINFNXPG009(Map<String, String> param, Map<String, Object> gwsynop) {
+		InspectHandler.handle(gwsynop, InspectStrategys.INFNXPG009, param);
+	}
+	
+	private Map<String, Object> getData(List<Map<String, Object>> list, String key, String value) {
+		if (key == null) return null;
+		if (value == null) return null;
+		if (list == null) return null;
+		
+		for(int i = 0; i < list.size(); i++) {
+			Map<String, Object> temp = list.get(i);
+			if (temp.containsKey(key)) {
+				if (value.equals(temp.get(key).toString())) {
+					return temp;
+				}
+			}
+		}
+		
+		return null;
+	}
+	
+	@Override
+	// VOD+관련상품 시놉시스
+	public void filterINFNXPG010(Map<String, String> param, Map<String, Object> commerce) {
+		InspectHandler.handle(commerce, InspectStrategys.INFNXPG010, param);
+
+		Map<String, String> ncmsParam = new HashMap<String, String>(param);
+		ncmsParam.put("ifname", "INFNXPG023");
+		String result = ifService.getNcmsData(ncmsParam);
+		List<Map<String, Object>> phraseList = CastUtils.getJSONArrayToMapList(new JSONArray(result));
+		
+		if (commerce.containsKey("info_id"))
+			commerce.put("info_id", getData(phraseList, "stb_exps_phrs_id", commerce.get("info_id").toString()));
+		if (commerce.containsKey("delivery_info_id"))
+			commerce.put("delivery_info_id", getData(phraseList, "stb_exps_phrs_id", commerce.get("delivery_info_id").toString()));
+		if (commerce.containsKey("refund_info_id"))
+			commerce.put("refund_info_id", getData(phraseList, "stb_exps_phrs_id", commerce.get("refund_info_id").toString()));
+		if (commerce.containsKey("clause_info_id"))
+			commerce.put("clause_info_id", getData(phraseList, "stb_exps_phrs_id", commerce.get("clause_info_id").toString()));
+	}
+	
+	@Override
+	// PPM+관련상품 시놉시스
+	public void filterINFNXPG032(Map<String, String> param, Map<String, Object> ppmCommerce) {
+		Map<String, String> ncmsParam = new HashMap<String, String>(param);
+		ncmsParam.put("ifname", "INFNXPG023");
+		String result = ifService.getNcmsData(ncmsParam);
+		List<Map<String, Object>> phraseList = CastUtils.getJSONArrayToMapList(new JSONArray(result));
+		
+		if (ppmCommerce.containsKey("info_id"))
+			ppmCommerce.put("info_id", getData(phraseList, "stb_exps_phrs_id", ppmCommerce.get("info_id").toString()));
+		if (ppmCommerce.containsKey("delivery_info_id"))
+			ppmCommerce.put("delivery_info_id", getData(phraseList, "stb_exps_phrs_id", ppmCommerce.get("delivery_info_id").toString()));
+		if (ppmCommerce.containsKey("refund_info_id"))
+			ppmCommerce.put("refund_info_id", getData(phraseList, "stb_exps_phrs_id", ppmCommerce.get("refund_info_id").toString()));
+		if (ppmCommerce.containsKey("clause_info_id"))
+			ppmCommerce.put("clause_info_id", getData(phraseList, "stb_exps_phrs_id", ppmCommerce.get("clause_info_id").toString()));
+	}
+	
+	@Override
+	// 구매버튼 관련
+	public void filterINFNXPG015(Map<String, String> param, Map<String, Object> purchares) {
+		if (purchares == null) return;
+		
+		String rslu_type = CastUtils.getObjectToString(param.get("rslu_typ_cd"));
+		Map<String, String> checkdate = collectionProperties.getCheckdate();
+		
+		List<Map<String, Object>> products = CastUtils.getObjectToMapList(purchares.get("products"));
+		InspectHandler.handle(products, InspectStrategys.INFNXPG015, param);
+		DateUtils.getCompare(products, "prd_prc_fr_dt", "purc_wat_to_dt", false);
+		
+		// ppm_yn, cmc_yn 필터링 
+		checkPPMList(products, param);
+		
+		products = CastUtils.getObjectToMapList(purchares.get("products"));
+		
+		// purchares 날짜 체크
+		for(int i = products.size()-1; i >= 0; i--) {
+			Map<String, Object> product = products.get(i);
+
+			// 2019-04-09
+			// 해상도 필터링 추가 
+			String rslu_typ_cd = CastUtils.getObjectToString(product.get("rslu_typ_cd"));
+			
+			//진입한 STB의 화질이 콘텐츠의 화질보다 낮을 경우 필터링.(상위 화질은 안보이게 한다.)
+			if (rslu_type != null && !rslu_type.isEmpty()
+					&& CastUtils.getStrToInt(rslu_typ_cd) > CastUtils.getStrToInt(rslu_type)) {
+				products.remove(i);
+				continue;
+			}
+			//////////
+
+			// 여기 필터링을 어떻게 할까?
+			/*
+			String strTemp = null;
+
+			String brcast_avl_perd_yn = "";
+			if (product.containsKey("brcast_avl_perd_yn")) {
+				brcast_avl_perd_yn = product.get("brcast_avl_perd_yn") + "";
+			}
+
+			// prd_prc_to_dt
+			if (product.get("prd_prc_to_dt") != null)
+				strTemp = product.get("prd_prc_to_dt").toString();
+			if (!"Y".equals(brcast_avl_perd_yn) && DateUtils.checkDate(strTemp, CastUtils.getStrToInt(checkdate.get("prdprctodt"))*-1))
+				product.put("expire_prd_prc_dt", strTemp);
+			else 
+				product.put("expire_prd_prc_dt", "");
+
+			// next_prd_prc_fr_dt
+			if (product.get("next_prd_prc_fr_dt") != null)
+				strTemp = product.get("next_prd_prc_fr_dt").toString();
+			if (!DateUtils.checkDate(strTemp, CastUtils.getStrToInt(checkdate.get("nextprdprcfrdt"))))
+				product.put("next_prd_prc_fr_dt", "");
+			
+			// ppm_orgnz_fr_dt
+			if (product.get("ppm_orgnz_fr_dt") != null)
+				strTemp = product.get("ppm_orgnz_fr_dt").toString();
+			if (!DateUtils.checkDate(strTemp, CastUtils.getStrToInt(checkdate.get("ppmorgnzfrdt"))))
+				product.put("ppm_orgnz_fr_dt", "");
+
+			// ppm_orgnz_to_dt
+			if (product.get("ppm_orgnz_to_dt") != null)
+				strTemp = product.get("ppm_orgnz_to_dt").toString();
+			if (!DateUtils.checkDate(strTemp, CastUtils.getStrToInt(checkdate.get("ppmorgnzfrdt"))))
+				product.put("ppm_orgnz_to_dt", "");
+				*/
+		}
+		
+		purchares.put("purchares", products);
+		///////////////////////
+	}
+	
+	@Override
+	// 시놉시스 관련(여러 인터페이스를 사용하는데 하나로 다 만들어서 처리했다고 한다.
+	public void filterINFNXPG007(Map<String, String> param, Map<String, Object> sris) {
+		if (sris == null) return;
+		
+		String sris_id = "", epsd_id = "";
+		Map<String, Object> epsd = null;
+		String rslu_type = CastUtils.getObjectToString(param.get("rslu_typ_cd"));
+		Map<String, String> checkdate = collectionProperties.getCheckdate();
+		
+		epsd_id = param.get("epsd_id");
+		
+		epsd = getSynopsisSrisInfo(param, epsd_id);
+		
+		// 처음에 가지고 오는 데이터.
+		// sris = getSynopContent(param);
+		
+		if (sris != null) {
+			if ("Y".equals(param.get("yn_recent")) && sris != null && "01".equals(sris.get("sris_typ_cd"))) {
+				
+				String series = CastUtils.getListToJsonArrayString(getContentsSeries(param));
+				if (series != null && !series.isEmpty()) {
+					String last_epsd_id = "";
+					Pattern p = Pattern.compile(".*epsd_id\":\"([^\"]+)\"");
+					Matcher m = p.matcher(series);
+					
+					if (m.find()) {
+						last_epsd_id = m.group(1);
+					}
+					
+					if (!last_epsd_id.isEmpty()) {
+						epsd_id = last_epsd_id;
+						epsd = getSynopsisSrisInfo(param, epsd_id);
+					}
+				}
+			}
+			List<Map<String, Object>> epsd_rslu_info = CastUtils.getObjectToMapList(epsd.get("epsd_rslu_info"));
+			
+			for (int i = epsd_rslu_info.size()-1; i >= 0; i--) {
+				Map<String, Object> map = epsd_rslu_info.get(i);
+				String rslu_typ_cd = CastUtils.getObjectToString(map.get("rslu_typ_cd"));
+				
+				//진입한 STB의 화질이 콘텐츠의 화질보다 낮을 경우 필터링.(상위 화질은 안보이게 한다)
+				if (rslu_type != null && !rslu_type.isEmpty()
+						&& CastUtils.getStrToInt(rslu_typ_cd) > CastUtils.getStrToInt(rslu_type)) {
+					epsd_rslu_info.remove(i);
+				}
+			}
+			
+		}
+		
+		if (epsd == null || sris == null) return;
+		
+		// ppm_yn, cmc_yn 필터링 
+		checkPPMList(epsd.get("products"), param);
+		
+		sris.putAll(epsd);
+		
+		sris.remove("relation_contents");
+		// 성공
+		getContentsPeople(sris, epsd_id, param);
+		getContentsCorner(sris, epsd_id, param);
+		getContentsPreview(sris, sris_id, param);
+		getContentsReview(sris, sris_id, param);
+
+		sris.put("combine_product_yn", "N");
+		if (param.containsKey("ukey_prd_id")) {
+			List<Map<String, Object>> ukeyList = CastUtils.getObjectToMapList(sris.get("ukey_products"));
+			for (Map<String, Object> ukey : ukeyList) {
+				if (ukey.containsKey("ukey_prd_id")) {
+					if (ukey.get("ukey_prd_id").equals(param.get("ukey_prd_id"))) {
+						sris.put("combine_product_yn", "Y");
+					}
+				}
+			}
+		}
+
+		sris.put("series_info", getContentsSeries(param)); //검수 추가 INFNXPG025 시리즈 회차 기본 정보.
+		sris.put("session_id",  CastUtils.getObjectToString(param.get("session_id")));
+		sris.put("track_id", CastUtils.getObjectToString(param.get("track_id")));
+		sris.put("menu_id", CastUtils.getObjectToString(param.get("cur_menu")));
+		sris.put("cw_call_id", CastUtils.getObjectToString(param.get("cw_call_id")));
+		
+		// String tempEnding = redisClient.hget("ending_cwcallidval", "ending_cwcallidval", param);
+		Map<String, String> ncmsParam = new HashMap<String, String>(param);
+		ncmsParam.put("ifname", "INFNXPG029");
+		String tempEnding = ifService.getNcmsData(ncmsParam);
+		
+		Map<String, Object> tempEndingMap = CastUtils.StringToJsonMap(tempEnding);
+		sris.put("ending_cw_call_id_val", null);
+		if (tempEndingMap != null && tempEndingMap.get("cw_call_id_val") != null) {
+			sris.put("ending_cw_call_id_val", tempEndingMap.get("cw_call_id_val"));
+		}
+		
+		// products 날짜 체크
+		if (sris != null) {
+			List<Map<String, Object>> products = CastUtils.getObjectToMapList(sris.get("products"));
+			DateUtils.getCompare(products, "prd_prc_fr_dt", "purc_wat_to_dt", false);
+			if (products != null) {
+				
+				for (int i = products.size()-1; i >= 0; i--) {
+					Map<String, Object> product = products.get(i);	
+					
+					// 2019-04-09
+					// 해상도 필터링 추가 
+					String rslu_typ_cd = CastUtils.getObjectToString(product.get("rslu_typ_cd"));
+					
+					//진입한 STB의 화질이 콘텐츠의 화질보다 낮을 경우 필터링.(상위 화질은 안보이게 한다)
+					if (rslu_type != null && !rslu_type.isEmpty()
+							&& CastUtils.getStrToInt(rslu_typ_cd) > CastUtils.getStrToInt(rslu_type)) {
+						products.remove(i);
+						continue;
+					}
+					//////////
+					
+					// 여기 필터링 어떻게 할까?
+					/*
+					String brcast_avl_perd_yn = "";
+					if (product.containsKey("brcast_avl_perd_yn")) {
+						brcast_avl_perd_yn = product.get("brcast_avl_perd_yn") + "";
+					}
+					
+					String strTemp = null;
+					// prd_prc_to_dt
+					if (product.get("prd_prc_to_dt") != null)
+						strTemp = product.get("prd_prc_to_dt").toString();
+					if (!"Y".equals(brcast_avl_perd_yn) && DateUtils.checkDate(strTemp, CastUtils.getStrToInt(checkdate.get("prdprctodt"))*-1))
+						product.put("expire_prd_prc_dt", strTemp);
+					else 
+						product.put("expire_prd_prc_dt", "");
+					
+					// next_prd_prc_fr_dt
+					if (product.get("next_prd_prc_fr_dt") != null)
+						strTemp = product.get("next_prd_prc_fr_dt").toString();
+					if (!DateUtils.checkDate(strTemp, CastUtils.getStrToInt(checkdate.get("nextprdprcfrdt"))))
+						product.put("next_prd_prc_fr_dt", "");
+					*/
+				}
+			}
+		}
+	}
+	
 	@Override
 	public Map<String, Object> filterINFNXPG004(Map<String, String> param, boolean LocFilterYn,
 			Map<String, Object> blockblock) {
@@ -497,4 +896,92 @@ public class FilterServiceImpl implements FilterService {
 
 		return result;
 	}
+
+	// ppm_yn으로 처리한다.
+	public static void checkPPMList(Object list, Map<String, String> param) {
+		String ppmYn = "N";
+		if (param.containsKey("ppm_yn")) {
+			ppmYn = param.get("ppm_yn");
+		}
+		
+		// Y가 아니면 ppm_yn 확인한다.
+		if (!"Y".equals(ppmYn)) {
+			List<Map<String, Object>> mapList = CastUtils.getObjectToMapList(list);
+			// ppm 상품 삭제.
+			for (int i = mapList.size()-1; i >= 0; i--) {
+				try {
+					Map<String, Object> map = mapList.get(i);
+					
+					if (!map.containsKey("prd_typ_cd")) {
+						continue;
+					}
+					String prdTydCd = (map.get("prd_typ_cd") + "").trim();
+					
+					if (ppmProduct.equals(prdTydCd)) {
+						mapList.remove(i);
+						continue;
+					}
+					
+					// 2019-07-09 박문수 
+					// 기간권 추가 
+					if ("32".equals(prdTydCd)) {
+						mapList.remove(i);
+						continue;
+					}
+					
+				} catch (Exception e) {
+					System.out.println(e.toString());
+				}
+			}
+			
+			checkPackBizList(list, param);
+		}
+	}
+	
+	// id_package 값을 확인하여서 price arr를 obj로 변환시켜준다.
+	public static void checkPackBizList(Object list, Map<String, String> param) {
+		String cmcYn = "N";
+		if (param.containsKey("cmc_yn")) {
+			cmcYn = param.get("cmc_yn");
+		}
+		
+		List<Map<String, Object>> mapList = CastUtils.getObjectToMapList(list);
+		if ("Y".equals(cmcYn) || mapList == null) return;
+		
+		for (int i = mapList.size()-1; i >= 0; i--) {
+			try {
+				Map<String, Object> map = mapList.get(i);
+				
+				if (!map.containsKey("prd_typ_cd")) {
+					continue;
+				}
+				String prdTydCd = (map.get("prd_typ_cd") + "").trim();
+				
+				if (commerceProduct.equals(prdTydCd)) {
+					mapList.remove(i);
+					continue;
+				}
+				
+			} catch (Exception e) {
+				System.out.println(e.toString());
+			}
+
+			// use_yn 추가.
+			try {
+				Map<String, Object> map = mapList.get(i);
+				
+				if (!map.containsKey("use_yn")) {
+					continue;
+				}
+				String useYn = (map.get("use_yn") + "").trim();
+				
+				if (!"Y".equals(useYn)) {
+					mapList.remove(i);
+				}
+			} catch (Exception e) {
+				System.out.println(e.toString());
+			}
+		}
+	}
+	
 }

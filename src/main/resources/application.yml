@@ -21,6 +21,11 @@ task:
   nxpg:
     url: https://xpg-nxpg-stg.skb-doj-dev01.mybluemix.net
 user:
+  checkdate:
+    ppmorgnzfrdt: 7
+    ppmorgnztodt: 7
+    prdprctodt: 14
+    nextprdprcfrdt: 3
   xpg:
     IF-NXPG-001:
       path: /v5/menu/gnb
@@ -59,9 +64,54 @@ user:
       processing:
     IF-NXPG-010:
       path: /v5/contents/synopsis
-      api: INFNXPG007|contents
-      requestparam: stb_id,menu_stb_svc_id,sris_id,epsd_id,epsd_rslu_id,search_type,yn_recent,ppm_yn,cmc_yn
+      api: INFNXPG007|contents,INFNXPG015|purchares
+      requestparam: stb_id,menu_stb_svc_id,sris_id,epsd_id,search_type,rslu_typ_cd,yn_recent,ppm_yn,cmc_yn
+      processing: track_id,menu_id,session_id,cw_call_id,expire_prd_prc_dt,next_prd_prc_fr_dt,ppm_orgnz_fr_dt,ppm_orgnz_to_dt,combine_product_yn
+    IF-NXPG-011:
+      path: /v5/people/info
+      api: INFNXPG017|menus
+      requestparam: stb_id,prs_id
       processing:
+    IF-NXPG-013:
+      path: /v5/added/epg
+      api: INFNXPG022|channel
+      requestparam: stb_id
+      processing:
+    IF-NXPG-014:
+      path: /v5/contents/gwsynop
+      api: INFNXPG009|package
+      requestparam: stb_id,search_type,sris_id
+      processing:
+    IF-NXPG-015:
+      path: /v5/contents/commerce
+      api: INFNXPG010|commerce
+      requestparam: stb_id,sris_id
+      processing:
+    IF-NXPG-016:
+      path: /v5/contents/corner
+      api: INFNXPG018|corners
+      requestparam: stb_id,cnr_grp_id
+      processing:
+    IF-NXPG-017:
+      path: /v5/added/epggenre
+      api: INFNXPG026|channel
+      requestparam: stb_id
+      processing:
+    IF-NXPG-019:
+      path: /v5/inside/info
+      api: INFNXPG030|inside_info
+      requestparam: stb_id,epsd_id
+      processing:
+    IF-NXPG-020:
+      path: /v5/synopsis/contentsfiledetails
+      api: INFNXPG031|file_contents
+      requestparam: stb_id,epsd_id
+      processing: result,reason,request_time,response_time,IF
+    IF-NXPG-021:
+      path: /v5/synopsis/ppmCommerce
+      api: INFNXPG032|contents
+      requestparam: stb_id,prd_prc_id
+      processing: 
   collections:
     INFNXPG001:
       name: menu_gnb
@@ -157,8 +207,8 @@ user:
       itemIsString: false
       isSingleKey: false
       baseField: items.item
-      deleteField:
-      checkField: sris_id,epsd_id,sub_title,brcast_tseq_nm,brcast_dy,wat_lvl_cd,adlt_lvl_cd,meta_typ_cd,rslu_typ_cd,play_tms_val,snd_typ_cd,mtx_capt_yn,nscrn_yn,director,actor,guest,chrtr,tpcc_comt,epsd_snss_cts,epsd_poster_filename_h,epsd_poster_filename_v,epsd_sales_comt_exps_mthd_cd,epsd_sales_comt_cts,epsd_sales_comt_img_path,epsd_sales_comt_call_typ_cd,epsd_sales_comt_call_objt_id,epsd_sales_vas_svc_id,epsd_sales_vas_itm_id,epsd_sales_comt_call_url,epsd_evt_comt_exps_mthd_cd,epsd_evt_comt_cts,epsd_evt_comt_img_path,epsd_evt_comt_call_typ_cd,epsd_evt_comt_call_objt_id,epsd_evt_vas_svc_id,epsd_evt_vas_itm_id,epsd_evt_comt_call_url,cacbro_yn,cacbro_cd,cw_call_id_val,pcim_dimn_cd,svc_fr_dt,svc_to_dt,gstn_yn,epsd_rslu_info,products,relation_contents,ukey_products
+      datefilter: 
+      segment: 
     INFNXPG009:
       name: synopsis_gateway
       mqkey: sris_id
@@ -169,8 +219,8 @@ user:
       itemIsString: false
       isSingleKey: false
       baseField: items.item
-      deleteField:
-      checkField: 
+      datefilter: 
+      segment: 
     INFNXPG010:
       name: synopsis_commerce
       mqkey: sris_id
@@ -181,8 +231,8 @@ user:
       itemIsString: false
       isSingleKey: false
       baseField: items.item
-      deleteField:
-      checkField: sris_id,bg_img_path,prd_prc_id,prd_typ_cd,asis_prd_typ_cd,prd_prc,prd_prc_vat,sale_prc,sale_prc_vat,rltn_prd_nm,rltn_prd_expl,info_id,delivery_info_id,refund_info_id,clause_info_id,meta_typ_cd,svc_fr_dt,svc_to_dt,kids_yn,contents,products
+      datefilter: 
+      segment: 
     INFNXPG011:
       name: contents_people
       mqkey: sris_id,epsd_id
@@ -193,8 +243,8 @@ user:
       itemIsString: false
       isSingleKey: false
       baseField: items.item
-      deleteField:
-      checkField: sris_id,epsd_id,peoples,prs_id,prs_role_cd,prs_role_nm,prs_nm,prs_plrl_nm,img_path,sort_seq
+      datefilter: 
+      segment: 
     INFNXPG012:
       name: contents_preview
       mqkey: sris_id
@@ -205,8 +255,8 @@ user:
       itemIsString: false
       isSingleKey: false
       baseField: items.item
-      deleteField:
-      checkField: sris_id,preview,stillCut,special
+      datefilter: 
+      segment: 
     INFNXPG013:
       name: contents_corner
       mqkey: sris_id,epsd_id
@@ -229,8 +279,8 @@ user:
       itemIsString: false
       isSingleKey: false
       baseField: items.item
-      deleteField:
-      checkField: sris_id,sites,btv_pnt_info,prize_history
+      datefilter: 
+      segment: 
     INFNXPG015:
       name: contents_purchares
       mqkey: sris_id
@@ -241,8 +291,8 @@ user:
       itemIsString: false
       isSingleKey: false
       baseField: items.item
-      deleteField:
-      checkField: sris_id,products,prd_prc_id,prd_typ_cd,asis_prd_typ_cd,possn_yn,lag_capt_typ_cd,rslu_typ_cd,purc_pref_rank,prd_prc,prd_prc_vat,sale_prc,sale_prc_vat,epsd_id,epsd_rslu_id,nscrn_yn,ppm_orgnz_fr_dt,ppm_orgnz_to_dt,next_prd_prc_fr_dt,prd_prc_fr_dt,prd_prc_to_dt,purc_wat_to_dt,use_yn
+      datefilter: 
+      segment: 
     INFNXPG016:
       name: contents_cidinfo
       mqkey: sris_id,epsd_id,epsd_rslu_id
@@ -265,8 +315,8 @@ user:
       itemIsString: false
       isSingleKey: false
       baseField: items.item
-      deleteField:
-      checkField: prs_id,prs_nm,rnm,prs_eng_nm,job_nm,brth_ymd,death_dy,hght_val,wgt_val,blood_nm,dbu_cts,mngco_nm,filmogrps
+      datefilter: 
+      segment: 
     INFNXPG018:
       name: corner_gather
       mqkey: cnr_grp_id
@@ -277,8 +327,8 @@ user:
       itemIsString: false
       isSingleKey: false
       baseField: items.item
-      deleteField:
-      checkField: cnr_grp_id
+      datefilter: 
+      segment: 
     INFNXPG019:
       name: menu_kidsGnb
       mqkey: menu_stb_svc_id,version
@@ -325,8 +375,8 @@ user:
       itemIsString: false
       isSingleKey: true
       baseField: items.item
-      deleteField:
-      checkField: total_count,newui_gnr_cd,newui_gnr_nm,channels,id_svc,no_ch,nm_ch,cd_area
+      datefilter: 
+      segment: 
     INFNXPG023:
       name: contents_phrase
       mqkey: 
@@ -373,8 +423,8 @@ user:
       itemIsString: false
       isSingleKey: true
       baseField: items.item
-      deleteField:
-      checkField: total_count,category_id,category_name,channels,service_id,channel_no,channel_name
+      datefilter: 
+      segment: 
     INFNXPG029:
       name: ending_cwcallidval
       mqkey: 
@@ -385,8 +435,8 @@ user:
       itemIsString: true
       isSingleKey: true
       baseField: items.item
-      deleteField:
-      checkField: cw_call_id_val
+      datefilter: 
+      segment: 
     INFNXPG030:
       name: inside_info
       mqkey: epsd_id
@@ -397,8 +447,8 @@ user:
       itemIsString: true
       isSingleKey: false
       baseField: items.item
-      deleteField:
-      checkField: epsd_id,meta_id
+      datefilter: 
+      segment: 
     INFNXPG031:
       name: synopsis_contentsfiledetails
       mqkey: epsd_id
@@ -409,8 +459,8 @@ user:
       itemIsString: true
       isSingleKey: false
       baseField: items.item
-      deleteField:
-      checkField: epsd_id,file_contents
+      datefilter: 
+      segment: 
     INFNXPG032:
       name: synopsis_ppmCommerce
       mqkey: prd_prc_id
@@ -421,8 +471,8 @@ user:
       itemIsString: true
       isSingleKey: false
       baseField: items.item
-      deleteField:
-      checkField: prd_prc_id,prd_typ_cd,asis_prd_typ_cd,purc_pref_rank,prd_prc,prd_prc_vat,sale_prc,sale_prc_vat,prd_prc_fr_dt,prd_prc_to_dt,purc_wat_to_dt,use_yn,rltn_prd_nm
+      datefilter: 
+      segment: 
     INFNXPG033:
       name: menu_lightHomeGnb
       mqkey: menu_stb_svc_id

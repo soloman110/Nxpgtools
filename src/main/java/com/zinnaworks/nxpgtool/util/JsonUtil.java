@@ -261,17 +261,7 @@ public final class JsonUtil {
 										
 					nxpgValue = CastUtils.getStringToJSONObject(jObj1, key);
 					ncmsValue = CastUtils.getStringToJSONObject(jObj2, key);
-					
-					/*
-					if (jObj1.get(key) instanceof Double) {
-						if (jObj1.getDouble(key) != jObj2.getDouble(key))
-							sync = false;
-					} else if (jObj1.get(key) instanceof Integer) {
-						if (jObj1.getInt(key) != jObj2.getInt(key))
-							sync = false;
-					} else {
-					}
-					*/
+
 					if (nxpgValue == null) {
 						if (ncmsValue != null) {
 							sync = false;
