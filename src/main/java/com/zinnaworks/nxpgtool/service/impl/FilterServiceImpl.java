@@ -19,13 +19,13 @@ import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.zinnaworks.nxpgtool.config.CollectionProperties;
 import com.zinnaworks.nxpgtool.inspect.InspectHandler;
 import com.zinnaworks.nxpgtool.inspect.InspectStrategys;
 import com.zinnaworks.nxpgtool.service.FilterService;
 import com.zinnaworks.nxpgtool.service.IFService;
 import com.zinnaworks.nxpgtool.util.CastUtils;
 import com.zinnaworks.nxpgtool.util.DateUtils;
+import com.zinnaworks.nxpgtool.util.GridComparator;
 import com.zinnaworks.nxpgtool.util.JsonUtil;
 
 @Service
@@ -37,8 +37,8 @@ public class FilterServiceImpl implements FilterService {
 	@Autowired
 	IFService ifService;
 
-	@Autowired
-	private CollectionProperties collectionProperties;
+//	@Autowired
+//	private CollectionProperties collectionProperties;
 
 	private Map<String, Object> getSynopsisSrisInfo(Map<String, String> param, String epsd_id) {
 		Map<String, Object> result = null;
@@ -90,12 +90,13 @@ public class FilterServiceImpl implements FilterService {
 	// 코너 정보 가지고 오기.
 	public void getContentsCorner(Map<String, Object> contents, String epsd_id, Map<String, String> param) {
 		Map<String, String> ncmsParam = new HashMap<String, String>(param);
-		ncmsParam.put("ifname", "INFNXPG011");
+		ncmsParam.put("ifname", "INFNXPG013");
 		ncmsParam.put("epsd_id", epsd_id);
 		String result = ifService.getNcmsData(ncmsParam);
 		
 		if(result != null && !"".equals(result)) {
-			contents.putAll(CastUtils.StringToJsonMap(result));
+			Map<String, Object> corners = CastUtils.StringToJsonMap(result);
+			contents.put("corners", corners.get("corners"));
 		}else {
 			contents.put("corners", null);
 		}
@@ -211,6 +212,114 @@ public class FilterServiceImpl implements FilterService {
 		if (ppmCommerce.containsKey("clause_info_id"))
 			ppmCommerce.put("clause_info_id", getData(phraseList, "stb_exps_phrs_id", ppmCommerce.get("clause_info_id").toString()));
 	}
+
+	@Override
+	// Light 홈 GNB 메뉴 정보
+	public void filterINFNXPG033(Map<String, String> param, List<Map<String, Object>> menus) {
+		/*
+		if ("Y".equals(param.get("is_all"))) {
+			// 하위 block 가지고 오기.
+			for (int i = 0; i < menus.size(); i++) {
+				Map<String, Object> item = menus.get(i);
+				Map<String, String> blockParam = new HashMap<String, String>(param);
+				Map<String, String> gridParam = new HashMap<String, String>(param);
+				
+				// 메뉴 아이디 가지고 와서 설정 
+				blockParam.put("menu_id", CastUtils.getObjectToString(item.get("menu_id")));
+				
+				// grid count 세팅
+				gridParam.put("page_no", "1");
+
+				if (StrUtil.isEmpty(gridParam.get("page_cnt"))) {
+					gridParam.put("page_cnt", "6");
+				}
+				
+				// 기존 003에서 사용하는 함수 사용해서 block정보 가지고 오기.
+				Map<String, Object> block = getBlockBlock(ver, blockParam, false);
+				if (block != null) {
+					// 가지고 온 block 정보에서 필요한 blocks정보 가지고 오기 
+					List<Map<String, Object>> blockList = CastUtils.getObjectToMapList(block.get("blocks"));
+					if (blockList != null) {
+						// 하위 grid 정보 가지고 오기.
+						for(int blockIndex = 0; blockIndex < blockList.size(); blockIndex++) {
+							Map<String, Object> blockItem = blockList.get(blockIndex);
+							// grid 조회용 menu_id가지고 오기.
+							gridParam.put("menu_id", CastUtils.getObjectToString(blockItem.get("menu_id")));
+							Map<String, Object> gridReturn = new HashMap<String, Object>();
+							
+							// grid 정보 조회 
+							gridService.getGrid(gridReturn, gridParam);
+							
+							// grid 정보 가공
+							List<Map<String, Object>> gridList = CastUtils.getObjectToMapList(gridReturn.get("contents"));
+							if (gridList == null) {
+								blockItem.put("grid", null);
+								blockItem.put("total_count", 0);
+							} else {
+								blockItem.put("grid", gridList);
+								blockItem.put("total_count", CastUtils.getStrToInt(CastUtils.getObjectToString((gridReturn.get("total_count")))));
+							}
+						}
+					}
+					item.put("menus", blockList);
+				} else {
+					item.put("menus", null);
+				}
+			}
+		}
+		*/
+	}
+	
+
+	@Override
+	// 키즈존 캐릭터메뉴 정보
+	public void filterINFNXPG020(Map<String, String> param, List<Map<String, Object>> kzgnb) {
+		
+		InspectHandler.handle(kzgnb, InspectStrategys.INFNXPG020, param);
+
+		// 그리드 타이틀 정렬 처리
+		List<Map<String, Object>> mCopyGrids = null;
+		try {
+			String order_type = CastUtils.getObjectToString(param.get("order_type"));
+			
+			if(!"".equals(order_type)) {
+				mCopyGrids = new ArrayList<Map<String, Object>>(kzgnb);
+				
+				Collections.sort(mCopyGrids, new GridComparator(order_type, true));
+				kzgnb = mCopyGrids;
+			}
+		}
+		catch(Exception e){
+			
+		}
+	}
+
+	@Override
+	// 살아있는 동화 시놉시스
+	public void filterINFNXPG021(Map<String, String> param, Map<String, Object> contents) {
+		InspectHandler.handle(contents, InspectStrategys.INFNXPG021, param);
+		getContentsCorner(contents, param.get("epsd_id").toString(), param);
+	}
+
+	@Override
+	// 메뉴 맵핑정보
+	public  Map<String, Object> filterINFNXPG019(Map<String, String> param, List<Map<String, Object>> kids) {
+		
+		Map<String, Object> result = new HashMap<String, Object>();
+		
+		for(Map<String, Object> kid : kids) {
+			// 살아있는 동화 최상위 메뉴 ID 가져오기
+			if(("70").equals(kid.get("kidsz_gnb_cd"))) {
+				result.put("menu_id", CastUtils.getObjectToString(kid.get("menu_id")));
+			}
+			// 뽀로로 Talk 최상위 메뉴 ID 가져오기
+			if(("80").equals(kid.get("kidsz_gnb_cd"))) {
+				result.put("po_menu_id", CastUtils.getObjectToString(kid.get("menu_id")));
+			}
+		}
+		
+		return result;
+	}
 	
 	@Override
 	// 구매버튼 관련
@@ -218,7 +327,7 @@ public class FilterServiceImpl implements FilterService {
 		if (purchares == null) return;
 		
 		String rslu_type = CastUtils.getObjectToString(param.get("rslu_typ_cd"));
-		Map<String, String> checkdate = collectionProperties.getCheckdate();
+//		Map<String, String> checkdate = collectionProperties.getCheckdate();
 		
 		List<Map<String, Object>> products = CastUtils.getObjectToMapList(purchares.get("products"));
 		InspectHandler.handle(products, InspectStrategys.INFNXPG015, param);
@@ -294,7 +403,7 @@ public class FilterServiceImpl implements FilterService {
 		String sris_id = "", epsd_id = "";
 		Map<String, Object> epsd = null;
 		String rslu_type = CastUtils.getObjectToString(param.get("rslu_typ_cd"));
-		Map<String, String> checkdate = collectionProperties.getCheckdate();
+//		Map<String, String> checkdate = collectionProperties.getCheckdate();
 		
 		epsd_id = param.get("epsd_id");
 		

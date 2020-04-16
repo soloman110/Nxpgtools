@@ -129,6 +129,8 @@ public class IFServiceImpl implements IFService {
 				Map<String, Object> item = CastUtils.StringToJsonMap(ncmsResult);
 				if ("IF-NXPG-005".equals(param.get("ifname")))
 					filterService.filterINFNXPG004Month(param, item);
+				else if ("IF-NXPG-025".equals(param.get("ifname")))
+					item = filterService.filterINFNXPG004(param, true, item);
 				else 
 					item = filterService.filterINFNXPG004(ncmsParam, false, item);
 				ncmsResult = new JSONObject(item).toString();
@@ -181,11 +183,49 @@ public class IFServiceImpl implements IFService {
 				filterService.filterINFNXPG032(param, item);
 				ncmsResult = new JSONObject(item).toString();
 			}
+			
+			// Light 홈 GNB 메뉴 정보
+			if ("INFNXPG033".equals(tempApi[0])) {
+				List<Map<String, Object>> item = CastUtils.getJSONArrayToMapList(new JSONArray(ncmsResult));
+				filterService.filterINFNXPG033(param, item);
+				ncmsResult = new JSONArray(item).toString();
+			}
+			
+			// 키즈존 캐릭터메뉴 정보
+			if ("INFNXPG020".equals(tempApi[0])) {
+				List<Map<String, Object>> item = CastUtils.getJSONArrayToMapList(new JSONArray(ncmsResult));
+				filterService.filterINFNXPG020(param, item);
+				ncmsResult = new JSONArray(item).toString();
+			}
+			
+			// 메뉴 맵핑정보
+			if ("IF-NXPG-401".equals(param.get("ifname"))) {
+				List<Map<String, Object>> item = CastUtils.getJSONArrayToMapList(new JSONArray(ncmsResult));
+				ncmsResult = new JSONObject(filterService.filterINFNXPG019(param, item)).toString();
+			}
+			
+			// 키즈존 캐릭터메뉴 정보
+			if ("INFNXPG021".equals(tempApi[0])) {
+				List<Map<String, Object>> items = CastUtils.getJSONArrayToMapList(new JSONArray(ncmsResult));
+				Map<String, Object> item = null;
+				
+				for(int j = 0; j < items.size(); j++) {
+					if (param.get("epsd_id").toString().equals(items.get(j).get("epsd_id").toString())) {
+						item = items.get(j);
+						break;
+					}
+				}
+				
+				filterService.filterINFNXPG021(param, item);
+				ncmsResult = new JSONObject(item).toString();
+			}
 			//////////////////////////////////
 			
 			// 데이터 비교.
 			if (jNxpg.has(tempApi[1])) {
-				if (isArray) 
+				if ("IF-NXPG-401".equals(param.get("ifname"))) {
+					JsonUtil.descJSONObject(collectionProperties, tempApi[1], param, tempApi[0], resultList, jNxpg, new JSONObject(ncmsResult));
+				} else if (isArray) 
 					JsonUtil.descJSONArray(collectionProperties, tempApi[1], param, tempApi[0], resultList, jNxpg.getJSONArray(tempApi[1]), new JSONArray(ncmsResult));
 				else {
 					if (jNxpg.get(tempApi[1]) instanceof JSONArray) {

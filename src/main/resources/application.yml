@@ -112,6 +112,46 @@ user:
       api: INFNXPG032|contents
       requestparam: stb_id,prd_prc_id
       processing: 
+    IF-NXPG-022:
+      path: /v5/menu/lightHomeGnb
+      api: INFNXPG033|menus
+      requestparam: stb_id,menu_stb_svc_id
+      processing: 
+    IF-NXPG-023:
+      path: /v5/menu/miniHomeGnb
+      api: INFNXPG001|gnb_menus,INFNXPG034|mini_menus
+      requestparam: stb_id,menu_stb_svc_id
+      processing: 
+    IF-NXPG-024:
+      path: /v5/grid/gridEvent
+      api: INFNXPG006|contents,INFNXPG005|banners
+      requestparam: stb_id,menu_stb_svc_id,menu_id
+      processing: 
+    IF-NXPG-025:
+      path: /v5/menu/chblock
+      api: INFNXPG004|blocks,INFNXPG003|banners
+      requestparam: stb_id,menu_stb_svc_id,menu_id,loc_cd
+      processing: 
+    IF-NXPG-101:
+      path: /v5/menu/kzchar
+      api: INFNXPG020|menus
+      requestparam: stb_id,menu_stb_svc_id,order_type
+      processing: 
+    IF-NXPG-102:
+      path: /v5/menu/kzgnb
+      api: INFNXPG019|menus
+      requestparam: stb_id,menu_stb_svc_id
+      processing: 
+    IF-NXPG-401:
+      path: /v5/menu/lfthomemapping
+      api: INFNXPG019|menu_id
+      requestparam: stb_id,menu_stb_svc_id
+      processing: result,reason,request_time,response_time,IF
+    IF-NXPG-403:
+      path: /v5/contents/lftsynop
+      api: INFNXPG021|contents,INFNXPG015|purchares
+      requestparam: stb_id,menu_stb_svc_id,epsd_id,sris_id
+      processing: menu_id
   collections:
     INFNXPG001:
       name: menu_gnb
@@ -291,7 +331,7 @@ user:
       itemIsString: false
       isSingleKey: false
       baseField: items.item
-      datefilter: 
+      datefilter: prd_prc_fr_dt|purc_wat_to_dt
       segment: 
     INFNXPG016:
       name: contents_cidinfo
@@ -339,8 +379,8 @@ user:
       itemIsString: false
       isSingleKey: false
       baseField: items.item
-      deleteField:
-      checkField: menu_id,menu_nm,call_typ_cd,call_url,menu_exps_prop_cd,lim_lvl_yn,kidsz_gnb_cd,dist_fr_dt,dist_to_dt
+      datefilter: dist_fr_dt|dist_to_dt
+      segment: 
     INFNXPG020:
       name: menu_kidsCharacter
       mqkey: menu_stb_svc_id,version
@@ -351,8 +391,8 @@ user:
       itemIsString: false
       isSingleKey: false
       baseField: items.item
-      deleteField:
-      checkField: menu_id,menu_nm,call_typ_cd,call_url,menu_exps_prop_cd,lim_lvl_yn,kidsz_gnb_cd,blk_typ_cd,chrtr_nm,chrtr_expl,kids_age_cd,chrtr_fout_img,chrtr_fin1_img,chrtr_fin2_img,tot_chrtr_fout_img,chrtr_zon_sub_img,flag_fin_img,flag_fout_img,flag_new_img,block_types,chrtr_menu_cat_cd,cnts_typ_cd,shcut_epsd_id,shcut_sris_id,shcut_menu_id,synon_typ_cd,cw_call_id_val,vas_id,vas_svc_id,vas_itm_id,cmpgn_id,cmpgn_nm,cmpgn_fr_dt,cmpgn_to_dt,cmpgn_apl_fr_dt,cmpgn_apl_to_dt,cmpgn_itlk_typ_cd,sort_seq,dist_fr_dt,dist_to_dt
+      datefilter: dist_fr_dt|dist_to_dt
+      segment: 
     INFNXPG021:
       name: synopsis_liveChildStory
       mqkey: sris_id
@@ -483,8 +523,8 @@ user:
       itemIsString: false
       isSingleKey: false
       baseField: items.item
-      deleteField:
-      checkField: menu_id,menu_nm,lim_lvl_yn,gnb_typ_cd,dist_fr_dt,dist_to_dt
+      datefilter: dist_fr_dt|dist_to_dt
+      segment: 
     INFNXPG034:
       name: menu_miniHomeGnb
       mqkey: menu_stb_svc_id
@@ -495,5 +535,5 @@ user:
       itemIsString: false
       isSingleKey: false
       baseField: items.item
-      deleteField:
-      checkField: menu_id,menu_nm,lim_lvl_yn,gnb_typ_cd,dist_fr_dt,dist_to_dt,page_path
+      datefilter: dist_fr_dt|dist_to_dt
+      segment: 

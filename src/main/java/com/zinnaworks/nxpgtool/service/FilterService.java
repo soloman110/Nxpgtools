@@ -1,5 +1,6 @@
 package com.zinnaworks.nxpgtool.service;
 
+import java.util.List;
 import java.util.Map;
 
 public interface FilterService {
@@ -13,4 +14,8 @@ public interface FilterService {
 	public void filterINFNXPG009(Map<String, String> param, Map<String, Object> gwsynop);
 	public void filterINFNXPG010(Map<String, String> param, Map<String, Object> commerce);
 	public void filterINFNXPG032(Map<String, String> param, Map<String, Object> ppmCommerce);
+	public void filterINFNXPG033(Map<String, String> param, List<Map<String, Object>> menus);
+	public void filterINFNXPG020(Map<String, String> param, List<Map<String, Object>> kzgnb);
+	public  Map<String, Object> filterINFNXPG019(Map<String, String> param, List<Map<String, Object>> kids);
+	public void filterINFNXPG021(Map<String, String> param, Map<String, Object> contents);
 }
